@@ -1,0 +1,223 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum SubscriptionStatus {
+  INCOMPLETE
+  INCOMPLETE_EXPIRED
+  TRIALING
+  ACTIVE
+  PAST_DUE
+  CANCELED
+  UNPAID
+}
+
+model User {
+  id            Int         @id @default(autoincrement())
+  googleId      String?     @unique
+  email         String      @unique
+  name          String
+  password      String?
+  image         String?
+  lastLogin     DateTime?
+  emailVerified DateTime?
+  stripeCustomerId String?         @unique
+  points            Int         @default(0)
+  level             Int         @default(1)
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @default(now())
+  
+  courses       Course[]    @relation("UserCourses")
+  notes         Note[]      @relation("UserNotes")
+  flashcards    Flashcard[] @relation("UserFlashcards")
+  subscriptions Subscription[]
+
+  accounts        Account[]
+  sessions        Session[]
+}
+
+model Account {
+  id                 Int      @id @default(autoincrement())
+  userId             Int
+  type               String
+  provider           String
+  providerAccountId  String
+  refresh_token      String?
+  access_token       String?
+  expires_at         Int?
+  token_type         String?
+  scope              String?
+  id_token           String?
+  session_state      String?
+  oauth_token_secret String?
+  oauth_token        String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           Int      @id @default(autoincrement())
+  sessionToken String   @unique
+  userId       Int
+  expires      DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+model Course {
+  id          Int         @id @default(autoincrement())
+  prompt      String
+  title       String
+  slug        String      @unique
+  description String?
+  modulesJson Json?
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @default(now())
+  generatedBy Int?
+  
+  user        User?       @relation("UserCourses", fields: [generatedBy], references: [id], onDelete: SetNull)
+  
+  modules     Module[]
+  notes       Note[]      @relation("CourseNotes")
+  flashcards  Flashcard[] @relation("CourseFlashcards")
+}
+
+model Module {
+  id          Int         @id @default(autoincrement())
+  courseId    Int
+  title       String
+  slug        String      @unique
+  description String?
+  order       Int
+  
+  course      Course      @relation(fields: [courseId], references: [id])
+  
+  lessons     Lesson[]
+  notes       Note[]      @relation("ModuleNotes")
+  flashcards  Flashcard[] @relation("ModuleFlashcards")
+}
+
+model Lesson {
+  id        Int      @id @default(autoincrement())
+  moduleId  Int
+  title     String
+  slug        String      @unique
+  content   String?
+  media     Json?
+  order     Int
+  quiz      Json
+  completed Boolean  @default(false)
+  
+  module    Module   @relation(fields: [moduleId], references: [id])
+  medias    Media[]
+  
+  quizRecord Quiz?
+  
+  notes      Note[]      @relation("LessonNotes")
+  flashcards Flashcard[] @relation("LessonFlashcards")
+}
+
+model Flashcard {
+  id           Int      @id @default(autoincrement())
+  question     String
+  answer       String
+  easeFactor   Float
+  interval     Int
+  repetitions  Int
+  lastReviewed DateTime?
+  nextReview   DateTime?
+  
+  userId   Int
+  noteId   Int?
+  moduleId Int
+  courseId Int
+  lessonId Int
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  note   Note?   @relation("NoteFlashcards", fields: [noteId], references: [id])
+  user   User   @relation("UserFlashcards", fields: [userId], references: [id], onDelete: Cascade)
+  module Module @relation("ModuleFlashcards", fields: [moduleId], references: [id])
+  lesson Lesson @relation("LessonFlashcards", fields: [lessonId], references: [id])
+  course Course @relation("CourseFlashcards", fields: [courseId], references: [id])
+}
+
+model Note {
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String?
+  content     String
+  userId      Int
+  lessonId    Int
+  moduleId    Int
+  courseId    Int
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  user   User   @relation("UserNotes", fields: [userId], references: [id], onDelete: Cascade)
+  lesson Lesson @relation("LessonNotes", fields: [lessonId], references: [id])
+  flashcards Flashcard[] @relation("NoteFlashcards")
+  module Module @relation("ModuleNotes", fields: [moduleId], references: [id])
+  course Course @relation("CourseNotes", fields: [courseId], references: [id])
+}
+
+model Quiz {
+  id        Int             @id @default(autoincrement())
+  lessonId  Int             @unique
+  questions QuizQuestion[]
+
+  lesson    Lesson          @relation(fields: [lessonId], references: [id])
+}
+
+model QuizQuestion {
+  id            Int     @id @default(autoincrement())
+  quizId        Int
+  question      String
+  options       String[]
+  correctAnswer Int
+
+  quiz          Quiz    @relation(fields: [quizId], references: [id])
+}
+
+model Media {
+  id       Int    @id @default(autoincrement())
+  lessonId Int
+  type     String
+  url      String
+  caption  String?
+  
+  lesson   Lesson @relation(fields: [lessonId], references: [id])
+}
+
+model Subscription {
+  id                   Int                 @id @default(autoincrement())
+  userId               Int
+  stripeSubscriptionId String              @unique
+  status               SubscriptionStatus
+  planId               String
+  currentPeriodStart   DateTime?
+  currentPeriodEnd     DateTime?
+  cancelAtPeriodEnd    Boolean             @default(false)
+  canceledAt           DateTime?
+  createdAt            DateTime            @default(now())
+  updatedAt            DateTime            @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}

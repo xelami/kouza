@@ -1,0 +1,13 @@
+{
+  "extends": "@kouza/typescript-config/react-library.json",
+  "compilerOptions": {
+    //"outDir": "dist"
+    "baseUrl": ".",
+    "skipLibCheck": true,
+    "paths": {
+      "@kouza/ui/*": ["./src/*"]
+    }
+  },
+  "include": ["."],
+  "exclude": ["node_modules", "dist"]
+}
