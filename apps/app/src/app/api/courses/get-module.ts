@@ -10,6 +10,11 @@ export async function getModule(courseSlug: string, moduleSlug: string) {
     },
     include: {
       lessons: true,
+      course: {
+        include: {
+          user: true,
+        },
+      },
     },
   })
 

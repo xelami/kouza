@@ -13,6 +13,7 @@ export async function getCourse(courseSlug: string) {
           lessons: true,
         },
       },
+      user: true,
     },
   })
 

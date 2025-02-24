@@ -121,7 +121,7 @@ export default async function Home() {
                 </div>
               </CourseDialog>
             </div>
-            <div className="flex flex-col justify-center items-center gap-2 p-2 border rounded-md hover:bg-gray-100 transition w-full">
+            <div className="flex flex-col justify-center items-center gap-2 p-2 border rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 transition w-full">
               <CourseDialog pregeneratedPrompt="I want to learn all about creative writing.">
                 <div className="flex flex-col text-center">
                   <p className="font-medium">Advanced JavaScript Techniques</p>
@@ -131,7 +131,7 @@ export default async function Home() {
                 </div>
               </CourseDialog>
             </div>
-            <div className="flex flex-col justify-center items-center gap-2 p-2 border rounded-md hover:bg-gray-100 transition w-full">
+            <div className="flex flex-col justify-center items-center gap-2 p-2 border rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 transition w-full">
               <CourseDialog pregeneratedPrompt="I want to learn all about creative writing.">
                 <div className="flex flex-col text-center">
                   <p className="font-medium">Creative Writing Workshop</p>
@@ -145,27 +145,26 @@ export default async function Home() {
         </div>
 
         <div className="mt-8 md:mt-0 md:col-span-4 md:row-span-2 border shadow-md rounded-2xl relative flex flex-col items-center justify-center h-[400px] md:h-full p-4">
-          <div className="absolute top-4 left-4 text-2xl font-semibold tracking-tighter mb-4">
+          <div className="absolute top-4 left-4 flex gap-2 items-center text-2xl font-semibold tracking-tighter mb-4">
             <p className="text-2xl font-semibold tracking-tighter">Revise</p>
             {totalDueCards > 0 && (
-              <div className="bg-primary/10 text-primary rounded-full px-3 py-1 text-sm">
-                {totalDueCards} due
+              <div className="bg-primary/10 text-primary text-center rounded-full px-3 py-1 text-sm">
+                {totalDueCards + totalDueCards === 1
+                  ? "1 card"
+                  : `${totalDueCards} cards`}
               </div>
             )}
           </div>
 
-          <div className="space-y-4">
+          <div className="flex-1 flex flex-col items-center justify-center gap-2 w-full h-full mt-24 md:mt-0">
             {reviseStats.length > 0 ? (
               <>
-                <p className="text-sm text-muted-foreground">
-                  Upcoming reviews:
-                </p>
                 {reviseStats.map((card: ReviseStats) => (
                   <div
                     key={card.id}
-                    className="p-3 border rounded-lg hover:bg-gray-50"
+                    className="p-3 border rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 w-full"
                   >
-                    <div className="flex items-center justify-between">
+                    <div className="flex items-center text-center justify-between">
                       <div>
                         <p className="font-medium">
                           {card.module.course.title}

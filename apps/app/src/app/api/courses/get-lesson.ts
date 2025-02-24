@@ -10,7 +10,11 @@ export async function getLesson(reviewSlug: string) {
     include: {
       module: {
         include: {
-          course: true,
+          course: {
+            include: {
+              user: true,
+            },
+          },
         },
       },
     },

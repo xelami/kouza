@@ -39,7 +39,7 @@ async function getPaymentHistory(stripeCustomerId: string) {
 
 export default async function BillingPage() {
   const session = await auth()
-  if (!session?.user) redirect("/login")
+  if (!session?.user) redirect("/")
 
   const user = await db.user.findUnique({
     where: { id: Number(session.user.id) },

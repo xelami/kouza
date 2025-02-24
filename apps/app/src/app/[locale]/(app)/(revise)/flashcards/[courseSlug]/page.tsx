@@ -8,7 +8,8 @@ import { GlassWater } from "lucide-react"
 import Link from "next/link"
 import React from "react"
 import { FlashcardStats, Module } from "@/types/types"
-
+import { redirect } from "next/navigation"
+import { auth } from "@/auth"
 export const runtime = "edge"
 
 export default async function CourseFlashcardsPage({
@@ -16,8 +17,21 @@ export default async function CourseFlashcardsPage({
 }: {
   params: Promise<{ courseSlug: string }>
 }) {
+  const session = await auth()
   const { courseSlug } = await params
   const courseFlashcards = await getCourseFlashcards(courseSlug)
+
+  if (!courseFlashcards.course) {
+    redirect(`/`)
+  }
+
+  // Check if user property exists and compare IDs
+  if (
+    courseFlashcards.course.user &&
+    courseFlashcards.course.user.id !== Number(session?.user.id)
+  ) {
+    redirect(`/`)
+  }
 
   const overall = courseFlashcards.modules.reduce<FlashcardStats>(
     (acc: FlashcardStats, module) => {

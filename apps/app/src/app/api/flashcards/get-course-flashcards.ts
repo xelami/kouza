@@ -13,6 +13,9 @@ export async function getCourseFlashcards(courseSlug: string) {
 
   const course = await db.course.findUnique({
     where: { slug: courseSlug },
+    include: {
+      user: true,
+    },
   })
 
   if (!course) {
@@ -28,7 +31,11 @@ export async function getCourseFlashcards(courseSlug: string) {
       note: true,
       lesson: true,
       module: true,
-      course: true,
+      course: {
+        include: {
+          user: true,
+        },
+      },
     },
   })
 
@@ -64,6 +71,7 @@ export async function getCourseFlashcards(courseSlug: string) {
       id: course.id,
       title: course.title,
       description: course.description || "",
+      user: course.user,
     },
     modules,
   }

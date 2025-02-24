@@ -34,7 +34,7 @@ export default async function RootLayout(props: {
       <body
         className={`${fontSans.variable} ${fontMono.variable} font-sans antialiased`}
       >
-        <SessionProvider refetchInterval={0} refetchOnWindowFocus={false}>
+        <SessionProvider>
           <Providers locale={locale}>
             <main>{children}</main>
             <Toaster />

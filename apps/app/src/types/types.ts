@@ -83,6 +83,9 @@ export interface Course {
   prompt: string
   modulesJson: any
   generatedBy: number | null
+  user: {
+    id: number
+  }
 }
 
 export interface Note {

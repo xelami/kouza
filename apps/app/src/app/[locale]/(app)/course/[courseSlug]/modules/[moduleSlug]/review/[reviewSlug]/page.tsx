@@ -21,6 +21,8 @@ import { checkExistingFlashcards } from "@/app/api/flashcards/check-existing"
 import { toggleCompleted } from "@/app/api/courses/toggle-completed"
 import { cn } from "@kouza/ui/lib/utils"
 import { toast } from "sonner"
+import { redirect } from "next/navigation"
+import { useSession } from "next-auth/react"
 
 export const runtime = "edge"
 
@@ -29,6 +31,7 @@ export default function ReviewPage({
 }: {
   params: Promise<{ reviewSlug: string }>
 }) {
+  const { data: session } = useSession()
   const { reviewSlug } = React.use(params)
   const [lesson, setLesson] = useState<any>(null)
   const [prevLesson, setPrevLesson] = useState<any>(null)
@@ -46,12 +49,20 @@ export default function ReviewPage({
         setPrevLesson(lessonData.prevLesson)
         setNextLesson(lessonData.nextLesson)
         setIsCompleted(lessonData.lesson.completed)
+
+        if (
+          !session?.user?.id ||
+          (lessonData.lesson.module.course.user &&
+            lessonData.lesson.module.course.user.id !== Number(session.user.id))
+        ) {
+          redirect(`/`)
+        }
       } catch (error) {
         console.error("Error fetching lesson:", error)
       }
     }
     fetchLesson()
-  }, [reviewSlug])
+  }, [reviewSlug, session])
 
   useEffect(() => {
     async function checkFlashcards() {

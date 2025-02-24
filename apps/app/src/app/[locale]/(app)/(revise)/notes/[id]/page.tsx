@@ -2,6 +2,8 @@ import React from "react"
 import { db } from "@kouza/db"
 import MarkdownRenderer from "@/components/review/markdown-renderer"
 import Link from "next/link"
+import { redirect } from "next/navigation"
+import { auth } from "@/auth"
 
 export const runtime = "edge"
 
@@ -10,6 +12,7 @@ export default async function NotePage({
 }: {
   params: Promise<{ id: string }>
 }) {
+  const session = await auth()
   const { id } = await params
 
   const note = await db.note.findUnique({
@@ -25,6 +28,10 @@ export default async function NotePage({
 
   if (!note) {
     return <div>Note not found</div>
+  }
+
+  if (note.userId !== Number(session?.user.id)) {
+    redirect(`/`)
   }
 
   return (

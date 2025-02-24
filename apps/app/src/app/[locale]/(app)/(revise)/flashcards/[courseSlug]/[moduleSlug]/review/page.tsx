@@ -1,7 +1,8 @@
 import { db } from "@kouza/db"
 import React from "react"
 import ReviewFlashcards from "@/components/flashcards/review-flashcards"
-
+import { auth } from "@/auth"
+import { redirect } from "next/navigation"
 export const runtime = "edge"
 
 interface Params {
@@ -10,6 +11,7 @@ interface Params {
 }
 
 export default async function ReviewPage({ params }: { params: Params }) {
+  const session = await auth()
   const { moduleSlug } = await params
   const now = new Date()
 
@@ -24,12 +26,24 @@ export default async function ReviewPage({ params }: { params: Params }) {
           user: true,
         },
       },
-      course: true,
+      course: {
+        include: {
+          user: true,
+        },
+      },
     },
   })
 
   if (!module || !module.flashcards.length) {
     return <div>No flashcards due for review.</div>
+  }
+
+  if (!module.course.user) {
+    redirect(`/`)
+  }
+
+  if (module.course.user.id !== Number(session?.user.id)) {
+    redirect(`/`)
   }
 
   return (

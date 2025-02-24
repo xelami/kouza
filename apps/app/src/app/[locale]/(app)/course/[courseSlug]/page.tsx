@@ -3,7 +3,8 @@ import { Progress } from "@kouza/ui/components/progress"
 import Link from "next/link"
 import React from "react"
 import { Course, CourseModule, Lesson } from "@/types/types"
-
+import { auth } from "@/auth"
+import { redirect } from "next/navigation"
 export const runtime = "edge"
 
 export default async function CoursesPage({
@@ -11,11 +12,16 @@ export default async function CoursesPage({
 }: {
   params: { courseSlug: string }
 }) {
+  const session = await auth()
   const { courseSlug } = await params
   const course = await getCourse(courseSlug)
 
-  if (!course) {
-    return null
+  if (!course || !course.user) {
+    redirect(`/`)
+  }
+
+  if (course.user.id !== Number(session?.user.id)) {
+    redirect(`/`)
   }
 
   const totalLessons = course.modules?.reduce(

@@ -13,10 +13,9 @@ import {
 import { useState } from "react"
 import { deleteUser } from "@/app/api/user/delete-user"
 import { toast } from "sonner"
-import { useRouter } from "next/navigation"
 import { signOut } from "next-auth/react"
+
 export default function AccountPage() {
-  const router = useRouter()
   const [isDeleting, setIsDeleting] = useState(false)
   const [showDialog, setShowDialog] = useState(false)
 

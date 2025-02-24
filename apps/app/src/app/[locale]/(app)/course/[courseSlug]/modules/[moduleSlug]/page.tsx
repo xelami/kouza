@@ -1,8 +1,10 @@
 import { getModule } from "@/app/api/courses/get-module"
+import { auth } from "@/auth"
 import { Lesson, CourseModule } from "@/types/types"
 import { XCircle } from "lucide-react"
 import { CheckCircle } from "lucide-react"
 import Link from "next/link"
+import { redirect } from "next/navigation"
 import React from "react"
 
 export const runtime = "edge"
@@ -12,6 +14,8 @@ export default async function ModulePage({
 }: {
   params: { courseSlug: string; moduleSlug: string }
 }) {
+  const session = await auth()
+
   const { courseSlug, moduleSlug } = await params
 
   if (!courseSlug || !moduleSlug) {
@@ -20,8 +24,12 @@ export default async function ModulePage({
 
   const module = await getModule(courseSlug, moduleSlug)
 
-  if (!module) {
-    return null
+  if (!module || !module.course.user) {
+    redirect(`/`)
+  }
+
+  if (module.course.user.id !== Number(session?.user.id)) {
+    redirect(`/`)
   }
 
   return (

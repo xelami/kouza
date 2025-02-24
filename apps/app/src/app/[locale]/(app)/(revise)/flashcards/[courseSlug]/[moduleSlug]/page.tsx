@@ -1,3 +1,4 @@
+import { auth } from "@/auth"
 import { formatNextReview } from "@/lib/utils"
 import { db } from "@kouza/db"
 import { Button } from "@kouza/ui/components/button"
@@ -11,6 +12,7 @@ import {
 import { Progress } from "@kouza/ui/components/progress"
 import { ArrowLeft, Clock, GlassWater } from "lucide-react"
 import Link from "next/link"
+import { redirect } from "next/navigation"
 import React from "react"
 
 interface Params {
@@ -32,18 +34,31 @@ export default async function ModuleFlashcardsPage({
 }: {
   params: Params
 }) {
+  const session = await auth()
   const { moduleSlug } = await params
 
   const currentModule = await db.module.findUnique({
     where: { slug: moduleSlug },
     include: {
       flashcards: true,
-      course: true,
+      course: {
+        include: {
+          user: true,
+        },
+      },
     },
   })
 
   if (!currentModule) {
     return <div>Module not found</div>
+  }
+
+  if (!currentModule.course.user) {
+    redirect(`/`)
+  }
+
+  if (currentModule.course.user.id !== Number(session?.user.id)) {
+    redirect(`/`)
   }
 
   const modules = await db.module.findMany({

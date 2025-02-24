@@ -71,8 +71,8 @@ export default function Navbar({
       <div className="flex items-center gap-6">
         <SearchBar />
         <div className="flex items-center gap-6 px-4">
-          <NotificationDropdown />
-          <LocaleDropdown />
+          {/* <NotificationDropdown /> */}
+          {/* <LocaleDropdown /> */}
           <ThemeSwitcher />
           <MobileSidebar
             isSubscribed={isSubscribed}
