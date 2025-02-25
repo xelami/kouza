@@ -14,8 +14,7 @@ export function Providers({ children, locale }: ProviderProps) {
     <I18nProviderClient locale={locale}>
       <ThemeProvider
         attribute="class"
-        defaultTheme="system"
-        enableSystem
+        defaultTheme="dark"
         disableTransitionOnChange
       >
         {children}

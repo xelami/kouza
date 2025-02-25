@@ -4,7 +4,7 @@ import { Providers } from "@/components/providers"
 import Navbar from "@/components/layout/navbar"
 import Footer from "@/components/layout/footer"
 import MobileSidebar from "@/components/layout/mobile-sidebar"
-
+import { Metadata } from "next"
 export const runtime = "edge"
 
 const fontSans = Geist({
@@ -16,6 +16,11 @@ const fontMono = Geist_Mono({
   subsets: ["latin"],
   variable: "--font-mono",
 })
+
+export const metadata: Metadata = {
+  title: "KouzaAI - Level Up Your Learning",
+  description: "Kouza is the ultimate AI-powered learning platform.",
+}
 
 export default async function RootLayout(props: {
   children: React.ReactNode

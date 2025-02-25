@@ -20,18 +20,19 @@ export default function BentoSection() {
       name: "AI Course Generation",
       description:
         "Generate personalized courses on any topic in seconds with our advanced AI.",
-      href: "/",
+      href: "/features/course-generation",
       cta: "Learn more",
       background: (
-        <Image
-          src={main}
-          alt="AI Learning"
-          width={400}
-          height={300}
-          quality={85}
-          className="absolute opacity-60 object-cover"
-          placeholder="blur"
-        />
+        <div className="absolute inset-0 flex items-center justify-center overflow-hidden">
+          <Image
+            src={main}
+            alt="AI Learning"
+            fill
+            quality={85}
+            className="object-cover opacity-60"
+            placeholder="blur"
+          />
+        </div>
       ),
       className: "lg:row-start-1 lg:row-end-4 lg:col-start-2 lg:col-end-3",
     },
@@ -40,18 +41,19 @@ export default function BentoSection() {
       name: "Smart Flashcards",
       description:
         "Master concepts faster with AI-powered spaced repetition learning.",
-      href: "/",
+      href: "/features/srs-flashcards",
       cta: "Learn more",
       background: (
-        <Image
-          src={flashcard}
-          alt="AI Learning"
-          width={300}
-          height={200}
-          quality={85}
-          className="absolute -right-20 -top-24 opacity-60 object-cover"
-          placeholder="blur"
-        />
+        <div className="absolute inset-0 flex items-center justify-center overflow-hidden">
+          <Image
+            src={flashcard}
+            alt="Smart Flashcards"
+            fill
+            quality={85}
+            className="object-cover opacity-60"
+            placeholder="blur"
+          />
+        </div>
       ),
       className: "lg:col-start-1 lg:col-end-2 lg:row-start-1 lg:row-end-3",
     },
@@ -59,18 +61,19 @@ export default function BentoSection() {
       Icon: BookOpen,
       name: "Interactive Notes",
       description: "Create and organize study notes with AI assistance.",
-      href: "/",
+      href: "/features/interactive-notes",
       cta: "Learn more",
       background: (
-        <Image
-          src={note}
-          alt="Interactive Notes"
-          width={300}
-          height={200}
-          quality={85}
-          className="absolute -right-52 opacity-60 object-cover"
-          placeholder="blur"
-        />
+        <div className="absolute inset-0 flex items-center justify-center overflow-hidden">
+          <Image
+            src={note}
+            alt="Interactive Notes"
+            fill
+            quality={85}
+            className="object-cover opacity-60"
+            placeholder="blur"
+          />
+        </div>
       ),
       className: "lg:col-start-1 lg:col-end-2 lg:row-start-3 lg:row-end-4",
     },
@@ -78,14 +81,19 @@ export default function BentoSection() {
       Icon: GraduationCap,
       name: "The Professor",
       description: "Your personal AI tutor available 24/7 to answer questions.",
-      href: "/",
+      href: "/features/the-professor",
       cta: "Learn more",
       background: (
-        <Image
-          src={sc}
-          alt="AI Generation"
-          className="absolute -right-20 -top-20 opacity-60"
-        />
+        <div className="absolute inset-0 flex items-center justify-center overflow-hidden">
+          <Image
+            src={sc}
+            alt="The Professor"
+            fill
+            quality={85}
+            className="object-cover opacity-60"
+            placeholder="blur"
+          />
+        </div>
       ),
       className: "lg:col-start-3 lg:col-end-3 lg:row-start-1 lg:row-end-2",
     },
@@ -94,14 +102,19 @@ export default function BentoSection() {
       name: "Progress Tracking",
       description:
         "Track your learning progress with detailed analytics and insights.",
-      href: "/",
+      href: "/features/progress-tracking",
       cta: "Learn more",
       background: (
-        <Image
-          src={sc}
-          alt="AI Generation"
-          className="absolute -right-20 -top-20 opacity-60"
-        />
+        <div className="absolute inset-0 flex items-center justify-center overflow-hidden">
+          <Image
+            src={sc}
+            alt="Progress Tracking"
+            fill
+            quality={85}
+            className="object-cover opacity-60"
+            placeholder="blur"
+          />
+        </div>
       ),
       className: "lg:col-start-3 lg:col-end-3 lg:row-start-2 lg:row-end-4",
     },

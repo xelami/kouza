@@ -44,16 +44,10 @@ export default function Footer() {
               Pricing
             </Link>
             <Link
-              href="/blog"
+              href="/#faq"
               className="text-sm text-muted-foreground hover:text-primary transition-colors"
             >
-              Blog
-            </Link>
-            <Link
-              href="/changelog"
-              className="text-sm text-muted-foreground hover:text-primary transition-colors"
-            >
-              Changelog
+              FAQ
             </Link>
           </div>
         </div>
@@ -62,28 +56,16 @@ export default function Footer() {
           <h4 className="font-semibold">Resources</h4>
           <div className="flex flex-col gap-2">
             <Link
-              href="/docs"
-              className="text-sm text-muted-foreground hover:text-primary transition-colors"
-            >
-              Documentation
-            </Link>
-            <Link
               href="/help"
               className="text-sm text-muted-foreground hover:text-primary transition-colors"
             >
               Help Center
             </Link>
             <Link
-              href="/guides"
+              href="/feature-request"
               className="text-sm text-muted-foreground hover:text-primary transition-colors"
             >
-              Guides
-            </Link>
-            <Link
-              href="/api"
-              className="text-sm text-muted-foreground hover:text-primary transition-colors"
-            >
-              API
+              Feature Request
             </Link>
           </div>
         </div>

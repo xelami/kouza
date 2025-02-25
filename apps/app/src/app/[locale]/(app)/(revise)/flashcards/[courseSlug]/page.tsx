@@ -25,7 +25,6 @@ export default async function CourseFlashcardsPage({
     redirect(`/`)
   }
 
-  // Check if user property exists and compare IDs
   if (
     courseFlashcards.course.user &&
     courseFlashcards.course.user.id !== Number(session?.user.id)

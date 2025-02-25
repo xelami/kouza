@@ -25,7 +25,6 @@ export default function PricingSection() {
         particleCount: 240,
         spread: 360,
         origin: { y: 0.5 },
-        drift: 1,
       })
     }
   }
