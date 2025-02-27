@@ -11,7 +11,9 @@ import sc from "@/public/sc.png"
 import flashcard from "@/public/flashcard.png"
 import main from "@/public/main.png"
 import note from "@/public/note.png"
+import screenshot from "@/public/screenshot.png"
 import Image from "next/image"
+import xp from "@/public/xp.png"
 
 export default function BentoSection() {
   const features = [
@@ -22,18 +24,19 @@ export default function BentoSection() {
         "Generate personalized courses on any topic in seconds with our advanced AI.",
       href: "/features/course-generation",
       cta: "Learn more",
-      background: (
-        <div className="absolute inset-0 flex items-center justify-center overflow-hidden">
-          <Image
-            src={main}
-            alt="AI Learning"
-            fill
-            quality={85}
-            className="object-cover opacity-60"
-            placeholder="blur"
-          />
-        </div>
-      ),
+      // background: (
+      //   <div className="absolute inset-0 flex items-center justify-center overflow-hidden">
+      //     <Image
+      //       src={main}
+      //       alt="AI Learning"
+      //       width={400}
+      //       height={300}
+      //       quality={85}
+      //       className="w-auto h-auto opacity-60"
+      //       placeholder="blur"
+      //     />
+      //   </div>
+      // ),
       className: "lg:row-start-1 lg:row-end-4 lg:col-start-2 lg:col-end-3",
     },
     {
@@ -43,18 +46,19 @@ export default function BentoSection() {
         "Master concepts faster with AI-powered spaced repetition learning.",
       href: "/features/srs-flashcards",
       cta: "Learn more",
-      background: (
-        <div className="absolute inset-0 flex items-center justify-center overflow-hidden">
-          <Image
-            src={flashcard}
-            alt="Smart Flashcards"
-            fill
-            quality={85}
-            className="object-cover opacity-60"
-            placeholder="blur"
-          />
-        </div>
-      ),
+      // background: (
+      //   <div className="absolute inset-0 flex items-center justify-center overflow-hidden">
+      //     <Image
+      //       src={screenshot}
+      //       alt="Smart Flashcards"
+      //       width={400}
+      //       height={300}
+      //       quality={85}
+      //       className="w-auto h-auto opacity-60"
+      //       placeholder="blur"
+      //     />
+      //   </div>
+      // ),
       className: "lg:col-start-1 lg:col-end-2 lg:row-start-1 lg:row-end-3",
     },
     {
@@ -63,18 +67,19 @@ export default function BentoSection() {
       description: "Create and organize study notes with AI assistance.",
       href: "/features/interactive-notes",
       cta: "Learn more",
-      background: (
-        <div className="absolute inset-0 flex items-center justify-center overflow-hidden">
-          <Image
-            src={note}
-            alt="Interactive Notes"
-            fill
-            quality={85}
-            className="object-cover opacity-60"
-            placeholder="blur"
-          />
-        </div>
-      ),
+      // background: (
+      //   <div className="absolute inset-0 flex items-center justify-center overflow-hidden">
+      //     <Image
+      //       src={note}
+      //       alt="Interactive Notes"
+      //       width={400}
+      //       height={300}
+      //       quality={85}
+      //       className="w-auto h-auto opacity-60"
+      //       placeholder="blur"
+      //     />
+      //   </div>
+      // ),
       className: "lg:col-start-1 lg:col-end-2 lg:row-start-3 lg:row-end-4",
     },
     {
@@ -83,18 +88,19 @@ export default function BentoSection() {
       description: "Your personal AI tutor available 24/7 to answer questions.",
       href: "/features/the-professor",
       cta: "Learn more",
-      background: (
-        <div className="absolute inset-0 flex items-center justify-center overflow-hidden">
-          <Image
-            src={sc}
-            alt="The Professor"
-            fill
-            quality={85}
-            className="object-cover opacity-60"
-            placeholder="blur"
-          />
-        </div>
-      ),
+      // background: (
+      //   <div className="absolute inset-0 flex items-center justify-center overflow-hidden">
+      //     <Image
+      //       src={sc}
+      //       alt="The Professor"
+      //       width={400}
+      //       height={300}
+      //       quality={85}
+      //       className="w-auto h-auto opacity-60"
+      //       placeholder="blur"
+      //     />
+      //   </div>
+      // ),
       className: "lg:col-start-3 lg:col-end-3 lg:row-start-1 lg:row-end-2",
     },
     {
@@ -104,18 +110,19 @@ export default function BentoSection() {
         "Track your learning progress with detailed analytics and insights.",
       href: "/features/progress-tracking",
       cta: "Learn more",
-      background: (
-        <div className="absolute inset-0 flex items-center justify-center overflow-hidden">
-          <Image
-            src={sc}
-            alt="Progress Tracking"
-            fill
-            quality={85}
-            className="object-cover opacity-60"
-            placeholder="blur"
-          />
-        </div>
-      ),
+      // background: (
+      //   <div className="absolute inset-0 flex items-center justify-center overflow-hidden">
+      //     <Image
+      //       src={xp}
+      //       alt="Progress Tracking"
+      //       width={400}
+      //       height={300}
+      //       quality={85}
+      //       className="w-auto h-auto opacity-60"
+      //       placeholder="blur"
+      //     />
+      //   </div>
+      // ),
       className: "lg:col-start-3 lg:col-end-3 lg:row-start-2 lg:row-end-4",
     },
   ]

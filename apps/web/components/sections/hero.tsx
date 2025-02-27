@@ -39,8 +39,8 @@ export default function HeroSection() {
           width={1200}
           height={675}
           priority
-          quality={90}
-          className="rounded-lg sm:rounded-xl md:rounded-2xl object-cover w-full"
+          quality={100}
+          className="rounded-xl border-2 sm:rounded-xl md:rounded-2xl object-cover w-full"
           placeholder="blur"
         />
       </div>

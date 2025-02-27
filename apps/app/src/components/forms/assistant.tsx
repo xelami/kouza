@@ -23,7 +23,7 @@ import {
 import { Label } from "@kouza/ui/components/label"
 
 const formSchema = z.object({
-  prompt: z.string(),
+  prompt: z.string().max(180, "Message cannot exceed 180 characters"),
   personality: z.string().default("default"),
 })
 
@@ -39,12 +39,14 @@ interface AssistantFormProps {
   context?: string
   onMessageSent: (prompt: string) => void
   onResponseReceived: (response: string) => void
+  onContextCleared?: () => void
 }
 
 export default function AssistantForm({
   context,
   onMessageSent,
   onResponseReceived,
+  onContextCleared,
 }: AssistantFormProps) {
   const [isLoading, setIsLoading] = useState(false)
 
@@ -58,13 +60,18 @@ export default function AssistantForm({
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true)
+    const currentContext = context // Store current context before clearing
+    onContextCleared?.() // Clear context immediately when submitting
     try {
       onMessageSent(values.prompt)
-      const res = await addContext(values.prompt, context, values.personality)
+      const res = await addContext(
+        values.prompt,
+        currentContext,
+        values.personality
+      )
       const { object } = res
       onResponseReceived(object.content)
       form.setValue("prompt", "")
-      context = undefined
     } catch (error) {
       console.error("Failed to submit prompt", error)
     } finally {
@@ -94,9 +101,15 @@ export default function AssistantForm({
                   <Textarea
                     placeholder="Ask me anything..."
                     className="h-20 resize-none"
+                    maxLength={180}
                     {...field}
                   />
                 </FormControl>
+                <div className="flex justify-end">
+                  <span className="text-xs text-muted-foreground mt-1">
+                    {field.value.length}/180
+                  </span>
+                </div>
                 <FormMessage />
               </FormItem>
             )}

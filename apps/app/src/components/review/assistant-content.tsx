@@ -15,11 +15,13 @@ interface Message {
 interface AssistantContentProps {
   context?: string
   isSubscribed: boolean
+  onContextCleared?: () => void
 }
 
 export default function AssistantContent({
   context,
   isSubscribed,
+  onContextCleared,
 }: AssistantContentProps) {
   const [messages, setMessages] = useState<Message[]>([])
   const messagesContainerRef = useRef<HTMLDivElement>(null)
@@ -61,7 +63,7 @@ export default function AssistantContent({
       <div className="flex-1 overflow-y-auto">
         <div
           ref={messagesContainerRef}
-          className="px-4 py-4 space-y-6
+          className="px-4 py-4 pb-20 space-y-6
             scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent
             hover:scrollbar-thumb-gray-400 dark:scrollbar-thumb-gray-600
             dark:hover:scrollbar-thumb-gray-500"
@@ -98,6 +100,7 @@ export default function AssistantContent({
       <div className="sticky bottom-0 border-t bg-background p-4">
         <AssistantForm
           context={context}
+          onContextCleared={onContextCleared}
           onMessageSent={(content) => {
             addMessage({ role: "user", content })
             addMessage({ role: "assistant", content: "", loading: true })

@@ -2,14 +2,19 @@
 
 import AssistantContent from "./assistant-content"
 import { isUserSubscribed } from "@/hooks/is-subscribed"
-import { redirect } from "next/navigation"
 import { useEffect } from "react"
 import { useState } from "react"
 import { useSession } from "next-auth/react"
 
 export const runtime = "edge"
 
-export default function ASidebar({ context }: { context?: string }) {
+export default function ASidebar({
+  context,
+  onContextCleared,
+}: {
+  context?: string
+  onContextCleared?: () => void
+}) {
   const [isSubscribed, setIsSubscribed] = useState(false)
   const { data: session } = useSession()
 
@@ -36,7 +41,11 @@ export default function ASidebar({ context }: { context?: string }) {
           Ask Professor
         </h3>
       </div>
-      <AssistantContent context={context} isSubscribed={isSubscribed} />
+      <AssistantContent
+        context={context}
+        isSubscribed={isSubscribed}
+        onContextCleared={onContextCleared}
+      />
     </div>
   )
 }

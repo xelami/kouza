@@ -115,6 +115,8 @@ export default function ReviewPage({
       </div>
     )
 
+  console.log(assistantContext)
+
   return (
     <>
       <div className="flex flex-col px-4 md:px-8">
@@ -190,7 +192,10 @@ export default function ReviewPage({
         </div>
       </div>
       <div className="hidden xl:block h-screen sticky top-0 border-l border-gray-200">
-        <ASidebar context={assistantContext} />
+        <ASidebar
+          context={assistantContext}
+          onContextCleared={() => setAssistantContext("")}
+        />
       </div>
     </>
   )
