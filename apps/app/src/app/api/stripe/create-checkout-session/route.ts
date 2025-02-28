@@ -71,7 +71,7 @@ export async function POST(request: Request) {
       allow_promotion_codes: true,
       billing_address_collection: "auto",
       success_url: `${origin}/payments/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${origin}/cancel`,
+      cancel_url: `${origin}`,
     })
 
     return NextResponse.json({ url: checkoutSession.url })

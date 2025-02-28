@@ -52,12 +52,12 @@ export default async function BillingPage() {
   ])
 
   return (
-    <div className="max-w-5xl mx-auto p-6 space-y-8">
+    <div className="max-w-5xl w-full mx-auto p-6 space-y-8">
       <div className="space-y-2">
-        <h1 className="text-2xl font-bold tracking-tight">
+        <h1 className="text-4xl font-medium tracking-tight">
           Billing & Subscription
         </h1>
-        <p className="text-gray-500">
+        <p className="text-lg text-gray-500">
           Manage your subscription and payment methods
         </p>
       </div>

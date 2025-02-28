@@ -159,7 +159,7 @@ export async function newCourse(prompt: string) {
         title: course.title,
         slug: course.slug + "-" + userId,
         description: course.description,
-        generatedBy: userId ? parseInt(userId) : null,
+        generatedBy: Number(userId),
       },
     })
 
