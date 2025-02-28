@@ -60,8 +60,10 @@ export default function SubscribeButton() {
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
-        <DialogHeader>
-          <DialogTitle>Choose your plan</DialogTitle>
+        <DialogHeader className="flex flex-col items-center text-center space-y-0">
+          <DialogTitle className="text-3xl font-medium text-center tracking-tight">
+            Choose your plan
+          </DialogTitle>
           <DialogDescription>
             Get unlimited access to all courses and features
           </DialogDescription>
@@ -70,7 +72,7 @@ export default function SubscribeButton() {
           <div className="flex items-center justify-between">
             <div className="flex flex-col gap-1">
               <span className="text-sm font-medium">Annual billing</span>
-              <span className="text-sm text-gray-500">Save 20%</span>
+              <span className="text-sm text-gray-500">Save 23%</span>
             </div>
             <Switch
               checked={isAnnual}
@@ -83,7 +85,7 @@ export default function SubscribeButton() {
             <div className="flex flex-col gap-4">
               <div className="flex items-center justify-between">
                 <div className="text-lg font-medium">
-                  {isAnnual ? "$112/year" : "$12.99/month"}
+                  {isAnnual ? "$119.40/year" : "$12.95/month"}
                 </div>
                 <div className="text-sm text-gray-500">Pro</div>
               </div>

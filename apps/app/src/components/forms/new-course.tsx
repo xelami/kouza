@@ -47,14 +47,15 @@ export default function NewCourseForm({
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsSubmitted(true)
-    toast.success("Course is generating")
+    toast.success("Course creation started", {
+      description:
+        "Modules and lessons will be populated over the next few minutes. You can continue browsing while this happens.",
+    })
 
     try {
       await newCourse(values.prompt)
-    } catch (error) {
-      console.error("Failed to submit prompt", error)
-      toast.error("Failed to generate course")
-      setIsSubmitted(false)
+    } catch (error: any) {
+      toast.error(error.message)
     }
   }
 

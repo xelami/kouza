@@ -1,6 +1,7 @@
 "use server"
 
 import { auth } from "@/auth"
+import { isUserSubscribed } from "@/hooks/is-subscribed"
 import { createOpenAI } from "@ai-sdk/openai"
 import { db } from "@kouza/db"
 import { generateObject } from "ai"
@@ -31,6 +32,22 @@ export async function newFlashcards({ noteId, lessonId }: FlashcardInput) {
 
   if (!userId) {
     throw new Error("User not found")
+  }
+
+  const userSubscribed = await isUserSubscribed(Number(userId))
+
+  if (!userSubscribed) {
+    const flashcards = await db.flashcard.findMany({
+      where: {
+        userId: Number(userId),
+      },
+    })
+
+    if (flashcards.length >= 50) {
+      throw new Error(
+        "You have reached the maximum number of free flashcards. Subscribe to generate unlimited flashcards!"
+      )
+    }
   }
 
   if (!noteId && !lessonId) {

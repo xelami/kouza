@@ -16,7 +16,6 @@ import {
   Inbox,
   MenuIcon,
   Search,
-  Settings,
 } from "lucide-react"
 import Link from "next/link"
 import { signOut } from "next-auth/react"
@@ -61,11 +60,6 @@ const items = [
     title: "Generate Course",
     url: "/revise",
     icon: BicepsFlexed,
-  },
-  {
-    title: "Settings",
-    url: "/settings",
-    icon: Settings,
   },
 ]
 

@@ -8,42 +8,30 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum SubscriptionStatus {
-  INCOMPLETE
-  INCOMPLETE_EXPIRED
-  TRIALING
-  ACTIVE
-  PAST_DUE
-  CANCELED
-  UNPAID
-}
-
 model User {
-  id            Int         @id @default(autoincrement())
-  googleId      String?     @unique
-  email         String      @unique
-  name          String
-  password      String?
-  image         String?
-  lastLogin     DateTime?
-  emailVerified DateTime?
-  stripeCustomerId String?         @unique
-  points            Int         @default(0)
-  level             Int         @default(1)
-  createdAt     DateTime    @default(now())
-  updatedAt     DateTime    @default(now())
-  
-  courses       Course[]    @relation("UserCourses")
-  notes         Note[]      @relation("UserNotes")
-  flashcards    Flashcard[] @relation("UserFlashcards")
-  subscriptions Subscription[]
-
-  accounts        Account[]
-  sessions        Session[]
+  id               Int            @id @default(autoincrement())
+  googleId         String?        @unique
+  email            String         @unique
+  name             String
+  password         String?
+  image            String?
+  lastLogin        DateTime?
+  emailVerified    DateTime?
+  stripeCustomerId String?        @unique
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @default(now())
+  level            Int            @default(1)
+  points           Int            @default(0)
+  accounts         Account[]
+  courses          Course[]       @relation("UserCourses")
+  flashcards       Flashcard[]    @relation("UserFlashcards")
+  notes            Note[]         @relation("UserNotes")
+  sessions         Session[]
+  subscriptions    Subscription[]
 }
 
 model Account {
-  id                 Int      @id @default(autoincrement())
+  id                 Int     @id @default(autoincrement())
   userId             Int
   type               String
   provider           String
@@ -57,8 +45,7 @@ model Account {
   session_state      String?
   oauth_token_secret String?
   oauth_token        String?
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user               User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
 }
@@ -68,8 +55,7 @@ model Session {
   sessionToken String   @unique
   userId       Int
   expires      DateTime
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model VerificationToken {
@@ -84,18 +70,17 @@ model Course {
   id          Int         @id @default(autoincrement())
   prompt      String
   title       String
+  type        CourseType
   slug        String      @unique
   description String?
   modulesJson Json?
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @default(now())
   generatedBy Int?
-  
-  user        User?       @relation("UserCourses", fields: [generatedBy], references: [id], onDelete: SetNull)
-  
+  user        User?       @relation("UserCourses", fields: [generatedBy], references: [id])
+  flashcards  Flashcard[] @relation("CourseFlashcards")
   modules     Module[]
   notes       Note[]      @relation("CourseNotes")
-  flashcards  Flashcard[] @relation("CourseFlashcards")
 }
 
 model Module {
@@ -105,36 +90,31 @@ model Module {
   slug        String      @unique
   description String?
   order       Int
-  
-  course      Course      @relation(fields: [courseId], references: [id])
-  
-  lessons     Lesson[]
-  notes       Note[]      @relation("ModuleNotes")
   flashcards  Flashcard[] @relation("ModuleFlashcards")
+  lessons     Lesson[]
+  course      Course      @relation(fields: [courseId], references: [id])
+  notes       Note[]      @relation("ModuleNotes")
 }
 
 model Lesson {
-  id        Int      @id @default(autoincrement())
-  moduleId  Int
-  title     String
-  slug        String      @unique
-  content   String?
-  media     Json?
-  order     Int
-  quiz      Json
-  completed Boolean  @default(false)
-  
-  module    Module   @relation(fields: [moduleId], references: [id])
-  medias    Media[]
-  
-  quizRecord Quiz?
-  
-  notes      Note[]      @relation("LessonNotes")
+  id         Int         @id @default(autoincrement())
+  moduleId   Int
+  title      String
+  slug       String      @unique
+  content    String?
+  media      Json?
+  order      Int
+  quiz       Json
+  completed  Boolean     @default(false)
   flashcards Flashcard[] @relation("LessonFlashcards")
+  module     Module      @relation(fields: [moduleId], references: [id])
+  medias     Media[]
+  notes      Note[]      @relation("LessonNotes")
+  quizRecord Quiz?
 }
 
 model Flashcard {
-  id           Int      @id @default(autoincrement())
+  id           Int       @id @default(autoincrement())
   question     String
   answer       String
   easeFactor   Float
@@ -142,25 +122,22 @@ model Flashcard {
   repetitions  Int
   lastReviewed DateTime?
   nextReview   DateTime?
-  
-  userId   Int
-  noteId   Int?
-  moduleId Int
-  courseId Int
-  lessonId Int
-  
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  
-  note   Note?   @relation("NoteFlashcards", fields: [noteId], references: [id])
-  user   User   @relation("UserFlashcards", fields: [userId], references: [id], onDelete: Cascade)
-  module Module @relation("ModuleFlashcards", fields: [moduleId], references: [id])
-  lesson Lesson @relation("LessonFlashcards", fields: [lessonId], references: [id])
-  course Course @relation("CourseFlashcards", fields: [courseId], references: [id])
+  userId       Int
+  noteId       Int?
+  moduleId     Int
+  courseId     Int
+  lessonId     Int
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  course       Course    @relation("CourseFlashcards", fields: [courseId], references: [id])
+  lesson       Lesson    @relation("LessonFlashcards", fields: [lessonId], references: [id])
+  module       Module    @relation("ModuleFlashcards", fields: [moduleId], references: [id])
+  note         Note?     @relation("NoteFlashcards", fields: [noteId], references: [id])
+  user         User      @relation("UserFlashcards", fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Note {
-  id          Int      @id @default(autoincrement())
+  id          Int         @id @default(autoincrement())
   title       String
   description String?
   content     String
@@ -168,56 +145,66 @@ model Note {
   lessonId    Int
   moduleId    Int
   courseId    Int
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  
-  user   User   @relation("UserNotes", fields: [userId], references: [id], onDelete: Cascade)
-  lesson Lesson @relation("LessonNotes", fields: [lessonId], references: [id])
-  flashcards Flashcard[] @relation("NoteFlashcards")
-  module Module @relation("ModuleNotes", fields: [moduleId], references: [id])
-  course Course @relation("CourseNotes", fields: [courseId], references: [id])
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  flashcards  Flashcard[] @relation("NoteFlashcards")
+  course      Course      @relation("CourseNotes", fields: [courseId], references: [id])
+  lesson      Lesson      @relation("LessonNotes", fields: [lessonId], references: [id])
+  module      Module      @relation("ModuleNotes", fields: [moduleId], references: [id])
+  user        User        @relation("UserNotes", fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Quiz {
-  id        Int             @id @default(autoincrement())
-  lessonId  Int             @unique
+  id        Int            @id @default(autoincrement())
+  lessonId  Int            @unique
+  lesson    Lesson         @relation(fields: [lessonId], references: [id])
   questions QuizQuestion[]
-
-  lesson    Lesson          @relation(fields: [lessonId], references: [id])
 }
 
 model QuizQuestion {
-  id            Int     @id @default(autoincrement())
+  id            Int      @id @default(autoincrement())
   quizId        Int
   question      String
   options       String[]
   correctAnswer Int
-
-  quiz          Quiz    @relation(fields: [quizId], references: [id])
+  quiz          Quiz     @relation(fields: [quizId], references: [id])
 }
 
 model Media {
-  id       Int    @id @default(autoincrement())
+  id       Int     @id @default(autoincrement())
   lessonId Int
   type     String
   url      String
   caption  String?
-  
-  lesson   Lesson @relation(fields: [lessonId], references: [id])
+  lesson   Lesson  @relation(fields: [lessonId], references: [id])
 }
 
 model Subscription {
-  id                   Int                 @id @default(autoincrement())
+  id                   Int                @id @default(autoincrement())
   userId               Int
-  stripeSubscriptionId String              @unique
+  stripeSubscriptionId String             @unique
   status               SubscriptionStatus
   planId               String
   currentPeriodStart   DateTime?
   currentPeriodEnd     DateTime?
-  cancelAtPeriodEnd    Boolean             @default(false)
+  cancelAtPeriodEnd    Boolean            @default(false)
   canceledAt           DateTime?
-  createdAt            DateTime            @default(now())
-  updatedAt            DateTime            @updatedAt
+  createdAt            DateTime           @default(now())
+  updatedAt            DateTime           @updatedAt
+  user                 User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+enum CourseType {
+  FREE
+  FULL
+}
+
+enum SubscriptionStatus {
+  INCOMPLETE
+  INCOMPLETE_EXPIRED
+  TRIALING
+  ACTIVE
+  PAST_DUE
+  CANCELED
+  UNPAID
 }

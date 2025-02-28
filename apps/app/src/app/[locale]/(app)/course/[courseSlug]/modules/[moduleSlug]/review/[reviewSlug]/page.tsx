@@ -8,8 +8,6 @@ import ASidebar from "@/components/review/a-sidebar"
 import Link from "next/link"
 import { Button } from "@kouza/ui/components/button"
 import {
-  ArrowLeftIcon,
-  ArrowRightIcon,
   ChevronLeft,
   ChevronRight,
   Loader2,
@@ -78,18 +76,34 @@ export default function ReviewPage({
     setAssistantContext(context)
   }
 
-  const handleGenerateNote = (note: string) => {
-    generateNote(note, lesson?.id, lesson?.moduleId, lesson?.module?.courseId)
+  const handleGenerateNote = async (note: string) => {
+    const loadingToast = toast.loading("Generating note")
+    try {
+      await generateNote(
+        note,
+        lesson?.id,
+        lesson?.moduleId,
+        lesson?.module?.courseId
+      )
+      toast.dismiss(loadingToast)
+      toast.success("Note generated successfully")
+    } catch (error) {
+      toast.dismiss(loadingToast)
+      toast.error("Failed to generate note")
+    }
   }
 
   const handleLessonState = async (lessonId: number) => {
+    const loadingToast = toast.loading("Updating lesson status")
     try {
       const res = await toggleCompleted(Number(lessonId))
       setIsCompleted(res)
+      toast.dismiss(loadingToast)
       toast.success(
         res ? "Lesson marked as completed" : "Lesson marked as incomplete"
       )
     } catch (error) {
+      toast.dismiss(loadingToast)
       toast.error("Failed to update lesson status")
     }
   }
@@ -115,8 +129,6 @@ export default function ReviewPage({
       </div>
     )
 
-  console.log(assistantContext)
-
   return (
     <>
       <div className="flex flex-col px-4 md:px-8">
@@ -128,7 +140,11 @@ export default function ReviewPage({
             <ChevronLeft className="w-8 h-8" />
             <p className="text-xl">Back to module</p>
           </Link>
-          <Link className="flex flex-col items-center" href="#">
+          <Link
+            href="https://www.kouza-ai.com/help"
+            target="_blank"
+            className="flex flex-col items-center"
+          >
             <MessageCircleQuestion className="w-8 h-8" />
             <p className="text-xl">Help</p>
           </Link>

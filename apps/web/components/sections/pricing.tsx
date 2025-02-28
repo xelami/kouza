@@ -1,7 +1,8 @@
 "use client"
+
 import React, { useState } from "react"
 import { Button } from "@kouza/ui/components/button"
-import { Check } from "lucide-react"
+import { Check, X } from "lucide-react"
 import Link from "next/link"
 import { Switch } from "@kouza/ui/components/switch"
 import confetti from "canvas-confetti"
@@ -38,7 +39,7 @@ export default function PricingSection() {
         <span className="border border-gray-200 px-4 py-1 rounded-full text-sm font-medium tracking-tight bg-gradient-to-r from-black/10 to-black/20">
           Pricing
         </span>
-        <h3 className="text-6xl font-medium text-center tracking-tight text-foreground">
+        <h3 className="text-5xl sm:text-6xl font-medium text-center tracking-tight text-foreground">
           Pricing That Makes Sense
         </h3>
       </div>
@@ -85,14 +86,16 @@ export default function PricingSection() {
               </span>
             </div>
             <div className="flex items-center gap-2">
-              <Check className="w-5 h-5 text-primary" />
+              <X className="w-5 h-5 text-primary" />
               <span className="text-foreground">
                 Limited flashcards & notes
               </span>
             </div>
             <div className="flex items-center gap-2">
-              <Check className="w-5 h-5 text-primary" />
-              <span className="text-foreground">Community support</span>
+              <X className="w-5 h-5 text-primary" />
+              <span className="text-foreground">
+                No access to The Professor
+              </span>
             </div>
           </div>
         </div>

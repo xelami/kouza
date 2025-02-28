@@ -35,9 +35,6 @@ export default async function Home() {
 
   return (
     <>
-      <div className="flex flex-col w-full">
-        <p>{session?.user.name}</p>
-      </div>
       <div className="flex flex-col md:grid grid-cols-12 grid-rows-4 gap-4 py-12 h-full">
         <Card className="md:col-span-8 md:row-span-2 border shadow-md rounded-2xl h-full flex flex-col">
           <CardHeader>
@@ -109,8 +106,8 @@ export default async function Home() {
             Recommended Courses
           </p>
           <div className="flex-1 flex flex-col items-center justify-center gap-2 w-full h-full mt-24 md:mt-0">
-            <div className="flex flex-col justify-center items-center gap-2 p-2 border rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 transition w-full">
-              <CourseDialog pregeneratedPrompt="I want to learn all about machine learning.">
+            <CourseDialog pregeneratedPrompt="I want to learn all about machine learning.">
+              <div className="cursor-pointer flex flex-col justify-center items-center gap-2 p-2 border rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 transition w-full">
                 <div className="flex flex-col text-center">
                   <p className="font-medium">
                     Introduction to Machine Learning
@@ -119,28 +116,28 @@ export default async function Home() {
                     Get started with ML basics.
                   </p>
                 </div>
-              </CourseDialog>
-            </div>
-            <div className="flex flex-col justify-center items-center gap-2 p-2 border rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 transition w-full">
-              <CourseDialog pregeneratedPrompt="I want to learn all about creative writing.">
+              </div>
+            </CourseDialog>
+            <CourseDialog pregeneratedPrompt="I want to become a JavaScript expert.">
+              <div className="cursor-pointer flex flex-col justify-center items-center gap-2 p-2 border rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 transition w-full">
                 <div className="flex flex-col text-center">
                   <p className="font-medium">Advanced JavaScript Techniques</p>
                   <p className="text-sm text-gray-600">
                     Deep dive into JS modern features.
                   </p>
                 </div>
-              </CourseDialog>
-            </div>
-            <div className="flex flex-col justify-center items-center gap-2 p-2 border rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 transition w-full">
-              <CourseDialog pregeneratedPrompt="I want to learn all about creative writing.">
+              </div>
+            </CourseDialog>
+            <CourseDialog pregeneratedPrompt="I want to learn all about creative writing.">
+              <div className="cursor-pointer flex flex-col justify-center items-center gap-2 p-2 border rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 transition w-full">
                 <div className="flex flex-col text-center">
                   <p className="font-medium">Creative Writing Workshop</p>
                   <p className="text-sm text-gray-600">
                     Enhance your storytelling skills.
                   </p>
                 </div>
-              </CourseDialog>
-            </div>
+              </div>
+            </CourseDialog>
           </div>
         </div>
 

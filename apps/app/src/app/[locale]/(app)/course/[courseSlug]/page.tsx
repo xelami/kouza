@@ -5,6 +5,7 @@ import React from "react"
 import { Course, CourseModule, Lesson } from "@/types/types"
 import { auth } from "@/auth"
 import { redirect } from "next/navigation"
+import { InfoIcon } from "lucide-react"
 export const runtime = "edge"
 
 export default async function CoursesPage({
@@ -45,6 +46,18 @@ export default async function CoursesPage({
         <h3 className="max-w-5xl text-base md:text-lg font-light tracking-tight leading-snug">
           {course.description}
         </h3>
+
+        {course.type === "FREE" && (
+          <div className="flex justify-start mt-4">
+            <div className="inline-flex gap-2 items-center bg-gray-100 dark:bg-gray-800 px-4 py-2 text-sm tracking-tighter rounded-xl">
+              <InfoIcon className="w-4 h-4" />
+              <p>
+                This is a free course with a limited number of modules and
+                lessons. Subscribe to generate full length courses!
+              </p>
+            </div>
+          </div>
+        )}
 
         <div className="flex flex-row items-center justify-between md:justify-start gap-4 py-8 md:gap-24 md:py-12">
           <div className="flex flex-col items-center gap-2">

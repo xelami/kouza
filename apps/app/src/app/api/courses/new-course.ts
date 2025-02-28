@@ -1,6 +1,7 @@
 "use server"
 
 import { auth } from "@/auth"
+import { isUserSubscribed } from "@/hooks/is-subscribed"
 import { CourseModule, Lesson } from "@/types/types"
 import { createOpenAI } from "@ai-sdk/openai"
 import { db } from "@kouza/db"
@@ -62,16 +63,87 @@ type PrismaError = {
   message: string
 }
 
+const freePrompt = (prompt: string) =>
+  `Create a concise course outline based on: ${prompt}. Include up to 5 modules. Slug should be shortened version of title in lowercase. Module slugs should be shortened version of module title in lowercase.`
+const subscribedPrompt = (prompt: string) =>
+  `Create a concise course outline based on: ${prompt}. Include as many modules as possible. Slug should be shortened version of title in lowercase. Module slugs should be shortened version of module title in lowercase.`
+
+const freeModulePrompt = (moduleTitle: string) =>
+  `Create strictly up to 3 lessons for the module "${moduleTitle}". Keep descriptions brief. Slug should be shortened version of lesson title in lowercase.`
+const subscribedModulePrompt = (moduleTitle: string) =>
+  `Create as many lessons as possible for the module "${moduleTitle}". Keep descriptions brief. Slug should be shortened version of lesson title in lowercase.`
+
 export async function newCourse(prompt: string) {
   const session = await auth()
   const userId = session?.user?.id
 
+  if (!userId) {
+    throw new Error("User not found")
+  }
+
   try {
+    const userSubscribed = await isUserSubscribed(Number(userId))
+
+    const subscription = await db.subscription.findFirst({
+      where: {
+        userId: Number(userId),
+        OR: [
+          {
+            status: "ACTIVE",
+            currentPeriodEnd: {
+              gt: new Date(),
+            },
+          },
+          {
+            status: "CANCELED",
+            currentPeriodEnd: {
+              gt: new Date(),
+            },
+          },
+        ],
+      },
+      orderBy: {
+        currentPeriodStart: "desc",
+      },
+    })
+
+    if (!userSubscribed) {
+      const courses = await db.course.findMany({
+        where: {
+          generatedBy: Number(userId),
+        },
+      })
+
+      if (courses.length >= 3) {
+        throw new Error(
+          "You have reached the maximum number of free courses. Subscribe to generate up to 10 full length courses per month!"
+        )
+      }
+    } else {
+      const coursesThisMonth = await db.course.findMany({
+        where: {
+          generatedBy: Number(userId),
+          type: "FULL",
+          createdAt: {
+            gte:
+              subscription?.currentPeriodStart ??
+              new Date(new Date().setMonth(new Date().getMonth() - 1)),
+          },
+        },
+      })
+
+      if (coursesThisMonth.length >= 10) {
+        throw new Error(
+          "You have reached the maximum number of courses available this month."
+        )
+      }
+    }
+
     const courseResult = await generateObject({
       model: openai("gpt-4o-mini", { structuredOutputs: true }),
       schemaName: "course",
       schema: courseSchema,
-      prompt: `Create a concise course outline based on: ${prompt}. Include as many modules as possible. Slug should be shortened version of title in lowercase. Module slugs should be shortened version of module title in lowercase.`,
+      prompt: userSubscribed ? subscribedPrompt(prompt) : freePrompt(prompt),
     })
 
     if (!courseResult?.object) {
@@ -83,6 +155,7 @@ export async function newCourse(prompt: string) {
     const newCourse = await db.course.create({
       data: {
         prompt,
+        type: userSubscribed ? "FULL" : "FREE",
         title: course.title,
         slug: course.slug + "-" + userId,
         description: course.description,
@@ -113,7 +186,9 @@ export async function newCourse(prompt: string) {
               model: openai("gpt-4o-mini", { structuredOutputs: true }),
               schemaName: "moduleLessons",
               schema: moduleLessonsSchema,
-              prompt: `Create as many lessons as possible for the module "${courseModule.title}". Keep descriptions brief. Slug should be shortened version of lesson title in lowercase.`,
+              prompt: userSubscribed
+                ? subscribedModulePrompt(courseModule.title)
+                : freeModulePrompt(courseModule.title),
             })
 
             if (!lessonsResult?.object?.lessons) {
@@ -144,7 +219,12 @@ export async function newCourse(prompt: string) {
                 model: openai("gpt-4o-mini", { structuredOutputs: true }),
                 schemaName: "lessonContent",
                 schema: lessonContentSchema,
-                prompt: `Create rich and detailed content for lesson "${lesson?.title}". Minimum of 2000 words for content (not including quiz questions). Do not include any quiz questions in the content. After that, include many quiz questions with 4 options each in the quiz section.`,
+                prompt: `Create detailed educational content for lesson "${lesson?.title}". 
+                The content should be at least 2000 words and focus purely on teaching the material.
+                DO NOT include any quiz questions, exercises, or test material in the content section.
+                The quiz section will be handled separately in the quiz object.
+                After generating the main content, create a separate comprehensive quiz with multiple questions to test understanding.
+                Each quiz question must have exactly 4 options.`,
               })
 
               try {

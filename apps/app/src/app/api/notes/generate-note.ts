@@ -1,6 +1,7 @@
 "use server"
 
 import { auth } from "@/auth"
+import { isUserSubscribed } from "@/hooks/is-subscribed"
 import { createOpenAI } from "@ai-sdk/openai"
 import { db } from "@kouza/db"
 import { generateObject } from "ai"
@@ -25,10 +26,26 @@ export async function generateNote(
 ) {
   const session = await auth()
 
-  const userId = await session?.user.id
+  const userId = session?.user.id
 
   if (!userId) {
     throw new Error("User not found")
+  }
+
+  const userSubscribed = await isUserSubscribed(Number(userId))
+
+  if (!userSubscribed) {
+    const notes = await db.note.findMany({
+      where: {
+        userId: Number(userId),
+      },
+    })
+
+    if (notes.length >= 10) {
+      throw new Error(
+        "You have reached the maximum number of free notes. Subscribe to generate unlimited notes!"
+      )
+    }
   }
 
   const noteResult = await generateObject({

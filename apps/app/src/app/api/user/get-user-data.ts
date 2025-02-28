@@ -24,7 +24,11 @@ export async function getUserData(userId: string | undefined) {
     isSubscribed = stripeSubscription.status === "active"
   }
 
-  const courseCount = await db.course.count()
+  const courseCount = await db.course.count({
+    where: {
+      generatedBy: Number(userId),
+    },
+  })
 
   return {
     isSubscribed,

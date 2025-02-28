@@ -24,6 +24,8 @@ export default async function CoursesPage() {
 
   const courses = await getCourses(Number(userId))
 
+  console.log(courses)
+
   return (
     <div className="flex flex-col font-[family-name:var(--font-geist-sans)] h-full p-6 px-4">
       {courses.length ? (
@@ -32,7 +34,12 @@ export default async function CoursesPage() {
             <Link href={`/course/${course.slug}`} key={course.id}>
               <Card>
                 <CardHeader>
-                  <CardTitle>{course.title}</CardTitle>
+                  <div className="flex flex-row items-center gap-2 justify-between">
+                    <CardTitle>{course.title}</CardTitle>
+                    <span className="text-sm uppercase px-2 py-1 bg-gray-200 dark:bg-gray-800 rounded-xl">
+                      {course.type}
+                    </span>
+                  </div>
                   <CardDescription>{course.description}</CardDescription>
                 </CardHeader>
                 <CardFooter className="flex items-center gap-6">

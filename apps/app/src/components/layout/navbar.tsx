@@ -1,8 +1,6 @@
 "use client"
 
 import React from "react"
-import NotificationDropdown from "../dashboard/notification-dropdown"
-import LocaleDropdown from "../locale-dropdown"
 import SearchBar from "../dashboard/search-bar"
 import { usePathname } from "next/navigation"
 import MobileSidebar from "./mobile-sidebar"
@@ -10,7 +8,6 @@ import ThemeSwitcher from "../theme-switcher"
 
 const routeTitles: Record<string, string> = {
   "/courses": "Courses",
-  "/settings": "Settings",
   "/notes": "Notes",
   "/flashcards": "Flashcards",
   "/search": "Search",
@@ -71,8 +68,6 @@ export default function Navbar({
       <div className="flex items-center gap-6">
         <SearchBar />
         <div className="flex items-center gap-6 px-4">
-          {/* <NotificationDropdown /> */}
-          {/* <LocaleDropdown /> */}
           <ThemeSwitcher />
           <MobileSidebar
             isSubscribed={isSubscribed}

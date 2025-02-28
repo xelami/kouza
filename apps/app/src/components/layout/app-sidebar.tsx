@@ -8,7 +8,6 @@ import {
   Home,
   Inbox,
   Search,
-  Settings,
   User2,
 } from "lucide-react"
 
@@ -64,11 +63,6 @@ const items = [
     title: "Flashcards",
     url: "/flashcards",
     icon: FileStackIcon,
-  },
-  {
-    title: "Settings",
-    url: "/settings",
-    icon: Settings,
   },
 ]
 
