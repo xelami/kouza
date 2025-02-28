@@ -1,35 +1,54 @@
 import { NextResponse } from "next/server"
+import { Resend } from "resend"
+import { verifyEmail } from "@/components/emails/verify-email"
 
 export const runtime = "edge"
+
+const resend = new Resend(process.env.RESEND_API_KEY!)
 
 export async function POST(req: Request) {
   try {
     const { email, url } = await req.json()
 
-    const payload = {
+    console.log("Attempting to send email to:", email)
+
+    if (!email || !url) {
+      console.error("Missing required fields:", { email, url })
+      return NextResponse.json(
+        { error: "Missing required fields" },
+        { status: 400 }
+      )
+    }
+
+    const { data, error } = await resend.emails.send({
       from: "noreply@kouza-ai.com",
       to: email,
       subject: "Verify your email",
-      text: url,
-    }
-
-    const response = await fetch("https://api.resend.com/emails", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${process.env.RESEND_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(payload),
+      html: verifyEmail(url),
     })
 
-    if (!response.ok) {
-      const errorText = await response.text()
-      console.error("Resend API error:", errorText)
-      throw new Error("Failed to send email")
+    if (error) {
+      console.error("Resend API error details:", {
+        error,
+        email,
+        errorMessage: error.message,
+        errorName: error.name,
+      })
+      return NextResponse.json(
+        { error: error.message || "Failed to send email" },
+        { status: 500 }
+      )
     }
 
-    return NextResponse.json({ success: true })
+    console.log("Email sent successfully:", { email, data })
+    return NextResponse.json({ success: true, data })
   } catch (error) {
-    return NextResponse.json({ error: "Failed to send email" }, { status: 500 })
+    console.error("Unexpected error in email sending:", error)
+    return NextResponse.json(
+      {
+        error: error instanceof Error ? error.message : "Failed to send email",
+      },
+      { status: 500 }
+    )
   }
 }

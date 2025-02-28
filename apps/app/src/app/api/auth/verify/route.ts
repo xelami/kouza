@@ -1,7 +1,11 @@
 import { db } from "@kouza/db"
 import { NextResponse } from "next/server"
+import { Resend } from "resend"
+import { welcomeEmail } from "@/components/emails/welcome-email"
 
 export const runtime = "edge"
+
+const resend = new Resend(process.env.RESEND_API_KEY!)
 
 export async function GET(req: Request) {
   try {
@@ -33,6 +37,22 @@ export async function GET(req: Request) {
       where: { id: user.id },
       data: { emailVerified: new Date() },
     })
+
+    const { data, error } = await resend.emails.send({
+      from: "noreply@kouza-ai.com",
+      to: email,
+      subject: "Welcome to Kouza!",
+      html: welcomeEmail(user.name),
+    })
+
+    if (error) {
+      console.error("Resend API error details:", {
+        error,
+        email,
+        errorMessage: error.message,
+        errorName: error.name,
+      })
+    }
 
     return NextResponse.redirect(
       `${process.env.NEXT_PUBLIC_URL}/login?verified=true`

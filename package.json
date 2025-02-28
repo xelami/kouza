@@ -21,5 +21,10 @@
   },
   "resolutions": {
     "@types/react": "18.x"
+  },
+  "dependencies": {
+    "@react-email/components": "^0.0.33",
+    "@react-email/render": "^1.0.5",
+    "@react-email/tailwind": "^1.0.4"
   }
 }
