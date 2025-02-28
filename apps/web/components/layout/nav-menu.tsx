@@ -19,30 +19,29 @@ const components: { title: string; href: string; description: string }[] = [
     title: "Course Generation",
     href: "/features/course-generation",
     description:
-      "A modal dialog that interrupts the user with important content and expects a response.",
+      "Generate a course from a text prompt. You can use this to generate a course on a specific topic, or use it to generate a course on a specific subject.",
   },
   {
     title: "The Professor",
     href: "/features/the-professor",
-    description:
-      "For sighted users to preview content available behind a link.",
+    description: "Your personalized AI tutor available 24/7.",
   },
   {
     title: "Progress Tracking",
     href: "/features/progress-tracking",
-    description:
-      "Displays an indicator showing the completion progress of a task, typically displayed as a progress bar.",
+    description: "Track your progress and see your growth.",
   },
   {
     title: "SRS Flashcards",
     href: "/features/srs-flashcards",
-    description: "Visually or semantically separates content.",
+    description:
+      "Generate spaced repetition flashcards optimized for long-term knowledge retention.",
   },
   {
     title: "Interactive Notes",
     href: "/features/interactive-notes",
     description:
-      "A set of layered sections of content—known as tab panels—that are displayed one at a time.",
+      "Summarize and expand on your course content with interactive notes.",
   },
 ]
 

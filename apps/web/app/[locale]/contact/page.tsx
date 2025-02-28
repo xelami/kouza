@@ -23,7 +23,7 @@ const formSchema = z.object({
   query: z.string().min(2).max(100),
 })
 
-export default function FeatureRequestPage() {
+export default function ContactPage() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -59,9 +59,7 @@ export default function FeatureRequestPage() {
   return (
     <div className="flex flex-col p-12 max-w-7xl mx-auto">
       <div className="flex flex-col text-lg text-center -space-y-2 gap-4 max-w-xl mx-auto">
-        <h1 className="text-6xl font-medium tracking-tight">
-          Request a Feature
-        </h1>
+        <h1 className="text-6xl font-medium tracking-tight">Contact Us</h1>
         <p className="text-lg tracking-tight text-muted-foreground">
           We&apos;d love to hear from you! Please use the form below to get in
           touch with us.

@@ -1,12 +1,6 @@
 import React from "react"
 import Link from "next/link"
 import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@kouza/ui/components/tabs"
-import {
   Accordion,
   AccordionContent,
   AccordionItem,
@@ -100,7 +94,7 @@ export default function HelpPage() {
         {
           id: "contact-support",
           title: "Contact Support",
-          text: "If you need additional help, our support team is available via email at support@kouza.ai. Please include detailed information about your issue, including any error messages, the device and browser you're using, and steps to reproduce the problem.",
+          text: "If you need additional help, our support team is available via email at contact@xelami.com. Please include detailed information about your issue, including any error messages, the device and browser you're using, and steps to reproduce the problem.",
         },
         {
           id: "feedback",

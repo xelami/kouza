@@ -67,6 +67,12 @@ export default function Footer() {
             >
               Feature Request
             </Link>
+            <Link
+              href="/contact"
+              className="text-sm text-muted-foreground hover:text-primary transition-colors"
+            >
+              Contact
+            </Link>
           </div>
         </div>
 

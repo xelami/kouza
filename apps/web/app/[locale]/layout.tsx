@@ -5,6 +5,7 @@ import Navbar from "@/components/layout/navbar"
 import Footer from "@/components/layout/footer"
 import MobileSidebar from "@/components/layout/mobile-sidebar"
 import { Metadata } from "next"
+import { Toaster } from "sonner"
 export const runtime = "edge"
 
 const fontSans = Geist({
@@ -38,6 +39,7 @@ export default async function RootLayout(props: {
         className={`container mx-auto ${fontSans.variable} ${fontMono.variable} font-sans antialiased `}
       >
         <Providers locale={locale}>
+          <Toaster />
           <header className="flex items-center justify-between w-full p-4 sm:p-6 lg:p-8">
             <Navbar />
             <MobileSidebar />

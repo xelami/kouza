@@ -46,7 +46,7 @@ export function welcomeEmail(name: string) {
                   💡 Need Help?
                 </h3>
                 <p style="margin: 0; color: #4a5568; font-size: 16px; line-height: 24px;">
-                  Check out our <a href="https://kouza-ai.com/docs" style="color: #2563eb; text-decoration: none;">documentation</a> or reach out to our <a href="mailto:support@kouza-ai.com" style="color: #2563eb; text-decoration: none;">support team</a>.
+                  Check out our <a href="https://kouza-ai.com/docs" style="color: #2563eb; text-decoration: none;">documentation</a> or reach out to our <a href="mailto:contact@xelami.com" style="color: #2563eb; text-decoration: none;">support team</a>.
                 </p>
               </div>
             </div>
