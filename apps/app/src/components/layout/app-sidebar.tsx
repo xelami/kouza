@@ -1,7 +1,9 @@
 "use client"
 
 import {
+  BarChart,
   BicepsFlexed,
+  BookOpen,
   ChevronUp,
   FileStackIcon,
   FileText,
@@ -64,6 +66,16 @@ const items = [
     url: "/flashcards",
     icon: FileStackIcon,
   },
+  {
+    title: "Progress",
+    url: "/progress",
+    icon: BarChart,
+  },
+  {
+    title: "Objectives",
+    url: "/objectives",
+    icon: BookOpen,
+  },
 ]
 
 export default function AppSidebar({
@@ -103,9 +115,8 @@ export default function AppSidebar({
                 <CourseDialog>
                   <SidebarMenuItem className="cursor-pointer">
                     <SidebarMenuButton asChild>
-                      <div className="flex">
-                        <BicepsFlexed />
-
+                      <div className="flex items-center gap-2 bg-black dark:bg-white text-white dark:text-black rounded-lg px-3 py-2 font-medium shadow-md hover:shadow-lg hover:bg-gray-900 hover:text-white dark:hover:bg-gray-100 transition-all border border-transparent dark:border-gray-200">
+                        <BicepsFlexed className="h-5 w-5" />
                         <span>Generate Course</span>
                       </div>
                     </SidebarMenuButton>
@@ -156,7 +167,18 @@ export default function AppSidebar({
                     ) : (
                       <User2 size={24} />
                     )}
-                    {user.name}
+                    <div className="flex items-center gap-2">
+                      {user.name}
+                      {isSubscribed ? (
+                        <span className="bg-primary text-primary-foreground text-xs px-1.5 py-0.5 rounded-full font-medium">
+                          PRO
+                        </span>
+                      ) : (
+                        <span className="bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 text-xs px-1.5 py-0.5 rounded-full font-medium">
+                          FREE
+                        </span>
+                      )}
+                    </div>
                     <ChevronUp className="ml-auto" />
                   </SidebarMenuButton>
                 </DropdownMenuTrigger>

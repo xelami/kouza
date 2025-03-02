@@ -19,7 +19,7 @@ export async function getCourseFlashcards(courseSlug: string) {
   })
 
   if (!course) {
-    throw new Error("Course not found")
+    return { course: null, modules: [] }
   }
 
   const flashcards = await db.flashcard.findMany({

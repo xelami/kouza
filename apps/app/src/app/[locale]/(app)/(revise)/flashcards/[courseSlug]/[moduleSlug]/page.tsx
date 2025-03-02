@@ -9,11 +9,20 @@ import {
   CardHeader,
   CardTitle,
 } from "@kouza/ui/components/card"
-import { Progress } from "@kouza/ui/components/progress"
-import { ArrowLeft, Clock, GlassWater } from "lucide-react"
+import { ArrowLeft, Clock, GlassWater, Plus, Settings } from "lucide-react"
 import Link from "next/link"
 import { redirect } from "next/navigation"
 import React from "react"
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@kouza/ui/components/tabs"
+import ManageFlashcardsWrapper from "@/components/flashcards/manage-flashcards-wrapper"
+import ModuleStats from "@/components/flashcards/module-stats"
+import { FlashcardsProvider } from "@/components/flashcards/flashcards-context"
+import PracticeFlashcards from "@/components/flashcards/practice-flashcards"
 
 interface Params {
   moduleSlug: string
@@ -76,134 +85,187 @@ export default async function ModuleFlashcardsPage({
     (fc: Flashcard) => fc.lastReviewed !== null
   ).length
   const toReview = totalCards - reviewed
-  const progressPercent = totalCards > 0 ? (reviewed / totalCards) * 100 : 0
 
   const now = new Date()
-  const cardsToReview = currentModule.flashcards.filter(
+  const dueFlashcards = currentModule.flashcards.filter(
     (fc: Flashcard) => !fc.nextReview || new Date(fc.nextReview) <= now
-  ).length
+  )
 
   return (
-    <div className="flex flex-col h-full p-4 sm:p-6 md:p-8">
-      <Link
-        className="flex items-center gap-2 mb-4 sm:mb-6 text-sm sm:text-base hover:text-primary transition-colors"
-        href={`/flashcards/${currentModule.course.slug}`}
-      >
-        <ArrowLeft className="w-4 sm:w-5 h-4 sm:h-5" />
-        Back to Course
-      </Link>
+    <FlashcardsProvider>
+      <div className="container mx-auto py-6 flex flex-col min-h-[calc(100vh-4rem)]">
+        <Link
+          className="flex items-center gap-2 mb-4 sm:mb-6 text-sm sm:text-base hover:text-primary transition-colors"
+          href={`/flashcards/${currentModule.course.slug}`}
+        >
+          <ArrowLeft className="w-4 sm:w-5 h-4 sm:h-5" />
+          Back to Course
+        </Link>
 
-      <div className="mb-6 sm:mb-8">
-        <h1 className="text-xl sm:text-2xl md:text-3xl font-semibold tracking-tight">
-          {currentModule.course?.title}
-        </h1>
-      </div>
-
-      <div className="mt-4 p-4 rounded-lg bg-muted/40">
-        <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 mb-2">
-          <span className="text-sm font-medium">
-            {progressPercent.toFixed(0)}%
-          </span>
-          <span className="text-sm font-medium">
-            {reviewed} / {totalCards} cards reviewed
-          </span>
+        <div className="mb-6 sm:mb-8">
+          <h1 className="text-xl sm:text-2xl md:text-3xl font-semibold tracking-tight">
+            {currentModule.course?.title}
+          </h1>
         </div>
-        <Progress value={progressPercent} className="h-2" />
-        <div className="mt-2 text-sm font-medium flex items-center gap-2">
-          <GlassWater className="w-4 sm:w-5 h-4 sm:h-5" />
-          <span>{toReview} cards to revise</span>
-        </div>
-      </div>
 
-      <div className="my-6 sm:my-8">
-        {currentModule.flashcards.length === 0 ? (
-          <p className="text-muted-foreground">
-            No flashcards for this module.
-          </p>
-        ) : (
-          <>
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4 sm:mb-6">
-              <h2 className="text-base sm:text-lg font-semibold">
-                ({currentModule.flashcards.length}) Flashcards
-              </h2>
-              {cardsToReview === 0 ? (
-                <Button disabled variant="outline" className="w-full sm:w-auto">
-                  No Cards to Review
-                </Button>
-              ) : (
-                <Button asChild className="w-full sm:w-auto">
-                  <Link
-                    href={`/flashcards/${currentModule.course.slug}/${currentModule.slug}/review`}
-                  >
-                    Review
+        <ModuleStats
+          moduleId={currentModule.id}
+          initialTotalCards={totalCards}
+          initialReviewed={reviewed}
+          initialToReview={toReview}
+        />
+
+        <Tabs defaultValue="review" className="mt-6">
+          <TabsList className="grid w-full grid-cols-3">
+            <TabsTrigger value="review">Review</TabsTrigger>
+            <TabsTrigger value="practice">Practice</TabsTrigger>
+            <TabsTrigger value="manage">Manage</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="review">
+            <div className="space-y-6">
+              {dueFlashcards.length === 0 ? (
+                <div className="text-center py-12">
+                  <GlassWater className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
+                  <h3 className="text-xl font-medium mb-2">All caught up!</h3>
+                  <p className="text-muted-foreground mb-6">
+                    You've reviewed all your due flashcards for this module.
+                  </p>
+                  <Link href={`/flashcards/${currentModule.course.slug}`}>
+                    <Button variant="outline">Back to Course</Button>
                   </Link>
-                </Button>
+                </div>
+              ) : (
+                <>
+                  <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
+                    <div>
+                      <h2 className="text-xl font-medium">Due for Review</h2>
+                      <p className="text-muted-foreground">
+                        {dueFlashcards.length} flashcards due for review
+                      </p>
+                    </div>
+                    <Link
+                      href={`/flashcards/${currentModule.course.slug}/${moduleSlug}/review`}
+                    >
+                      <Button>Start Review</Button>
+                    </Link>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {dueFlashcards.map((flashcard) => (
+                      <Card key={flashcard.id}>
+                        <CardHeader>
+                          <CardTitle className="text-base sm:text-lg">
+                            {flashcard.question}
+                          </CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <p className="text-sm sm:text-base text-muted-foreground">
+                            {flashcard.answer}
+                          </p>
+                        </CardContent>
+                        <CardFooter>
+                          <div className="flex items-center gap-2 text-xs sm:text-sm text-muted-foreground">
+                            <Clock className="w-4 h-4" />
+                            {flashcard.nextReview
+                              ? formatNextReview(flashcard.nextReview)
+                              : "Not scheduled"}
+                          </div>
+                        </CardFooter>
+                      </Card>
+                    ))}
+                  </div>
+                </>
               )}
             </div>
+          </TabsContent>
 
-            <div className="grid grid-cols-1 gap-4">
-              {currentModule.flashcards.map((flashcard: Flashcard) => (
-                <Card
-                  key={flashcard.id}
-                  className="border hover:shadow-lg transition-shadow"
-                >
-                  <CardHeader>
-                    <CardTitle className="text-base sm:text-lg">
-                      {flashcard.question}
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-sm sm:text-base text-muted-foreground">
-                      {flashcard.answer}
+          <TabsContent value="practice">
+            {currentModule.flashcards.length === 0 ? (
+              <div className="text-center py-12">
+                <GlassWater className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
+                <h3 className="text-xl font-medium mb-2">No flashcards yet</h3>
+                <p className="text-muted-foreground mb-6">
+                  This module doesn't have any flashcards to practice with.
+                </p>
+                <TabsTrigger value="manage" asChild>
+                  <Button variant="outline">Create Flashcards</Button>
+                </TabsTrigger>
+              </div>
+            ) : (
+              <>
+                <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mb-6">
+                  <div>
+                    <h2 className="text-xl font-medium">Practice Mode</h2>
+                    <p className="text-muted-foreground">
+                      Freely browse through all{" "}
+                      {currentModule.flashcards.length} flashcards without
+                      affecting your progress
                     </p>
-                  </CardContent>
-                  <CardFooter>
-                    <div className="flex items-center gap-2 text-xs sm:text-sm text-muted-foreground">
-                      <Clock className="w-4 h-4" />
-                      {flashcard.nextReview
-                        ? formatNextReview(flashcard.nextReview)
-                        : "Not scheduled"}
-                    </div>
-                  </CardFooter>
-                </Card>
-              ))}
-            </div>
-          </>
-        )}
-      </div>
+                  </div>
+                </div>
 
-      <div className="flex flex-col sm:flex-row justify-between gap-4 mt-auto pt-4 border-t">
-        {prevModule ? (
-          <Link
-            href={`/flashcards/${currentModule.course.slug}/${prevModule.slug}`}
-            className="w-full sm:w-auto"
-          >
-            <Button variant="outline" className="w-full sm:w-auto">
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              <span className="truncate">
-                <span className="text-muted-foreground mr-2">Previous:</span>
-                {prevModule.title}
-              </span>
-            </Button>
-          </Link>
-        ) : (
-          <div />
-        )}
-        {nextModule && (
-          <Link
-            href={`/flashcards/${currentModule.course.slug}/${nextModule.slug}`}
-            className="w-full sm:w-auto sm:ml-auto"
-          >
-            <Button variant="outline" className="w-full sm:w-auto">
-              <span className="truncate">
-                <span className="text-muted-foreground mr-2">Next:</span>
-                {nextModule.title}
-              </span>
-              <ArrowLeft className="w-4 h-4 ml-2 rotate-180" />
-            </Button>
-          </Link>
-        )}
+                <PracticeFlashcards
+                  flashcards={currentModule.flashcards.map((fc: any) => ({
+                    ...fc,
+                    lastReviewed: fc.lastReviewed
+                      ? new Date(fc.lastReviewed)
+                      : null,
+                    nextReview: fc.nextReview ? new Date(fc.nextReview) : null,
+                  }))}
+                />
+              </>
+            )}
+          </TabsContent>
+
+          <TabsContent value="manage">
+            <ManageFlashcardsWrapper
+              courseId={currentModule.course.id}
+              moduleId={currentModule.id}
+              flashcards={currentModule.flashcards.map((fc: any) => ({
+                ...fc,
+                lastReviewed: fc.lastReviewed
+                  ? new Date(fc.lastReviewed)
+                  : null,
+                nextReview: fc.nextReview ? new Date(fc.nextReview) : null,
+              }))}
+            />
+          </TabsContent>
+        </Tabs>
+
+        <div className="flex flex-col sm:flex-row justify-between gap-4 mt-auto pt-4 border-t">
+          {prevModule ? (
+            <Link
+              href={`/flashcards/${currentModule.course.slug}/${prevModule.slug}`}
+              className="w-full sm:w-auto"
+            >
+              <Button variant="outline" className="w-full sm:w-auto">
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                <span className="truncate">
+                  <span className="text-muted-foreground mr-2">Previous:</span>
+                  {prevModule.title}
+                </span>
+              </Button>
+            </Link>
+          ) : (
+            <div />
+          )}
+          {nextModule && (
+            <Link
+              href={`/flashcards/${currentModule.course.slug}/${nextModule.slug}`}
+              className="w-full sm:w-auto sm:ml-auto"
+            >
+              <Button variant="outline" className="w-full sm:w-auto">
+                <span className="truncate">
+                  <span className="text-muted-foreground mr-2">Next:</span>
+                  {nextModule.title}
+                </span>
+                <ArrowLeft className="w-4 h-4 ml-2 rotate-180" />
+              </Button>
+            </Link>
+          )}
+        </div>
       </div>
-    </div>
+    </FlashcardsProvider>
   )
 }

@@ -38,7 +38,7 @@ export default async function ProtectedLayout({
           isSubscribed={isSubscribed}
           courseCount={courseCount}
         >
-          {children}
+          <div className="flex-1 overflow-auto">{children}</div>
         </NavigationWrapper>
       </main>
     </SidebarProvider>

@@ -1,6 +1,6 @@
 "use client"
 
-import { getFlashcards } from "@/app/api/flashcards/get-flashcards"
+import { getFlashcards } from "@/app/api/flashcards/get-all-flashcards"
 import {
   CardDescription,
   CardFooter,
@@ -28,8 +28,8 @@ export default function FlashcardsPage() {
   }, [])
 
   return (
-    <div className="flex flex-col font-[family-name:var(--font-geist-sans)] h-full p-6 px-4">
-      <div className="flex flex-col items-center mx-auto max-w-4xl w-full gap-4 py-12 h-full overflow-y-auto">
+    <div className="flex flex-col font-[family-name:var(--font-geist-sans)] h-full p-6 px-4 overflow-y-auto">
+      <div className="flex flex-col items-center mx-auto max-w-4xl w-full gap-4 py-12 h-full">
         {flashcards &&
           flashcards.map((flashcard) => (
             <Link

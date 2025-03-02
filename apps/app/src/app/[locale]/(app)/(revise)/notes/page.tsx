@@ -20,6 +20,7 @@ import React, { useEffect, useState } from "react"
 import { Button } from "@kouza/ui/components/button"
 import { newFlashcards } from "@/app/api/flashcards/new-flashcards"
 import { Loader2 } from "lucide-react"
+import { toast } from "sonner"
 
 export const runtime = "edge"
 
@@ -69,10 +70,18 @@ export default function NotesPage() {
 
   const handleGenerateFlashcards = async (noteId: number) => {
     setGeneratingFlashcards((prev) => ({ ...prev, [noteId]: true }))
+    const toastId = toast.loading("Generating flashcards...")
+
     try {
-      await newFlashcards({ noteId: Number(noteId) })
-    } catch (error) {
-      console.error("Error generating flashcards:", error)
+      const result = await newFlashcards({ noteId: Number(noteId) })
+
+      if (result) {
+        toast.dismiss(toastId)
+        toast.success("Flashcards generated successfully")
+      }
+    } catch (error: any) {
+      toast.dismiss(toastId)
+      toast.error(error.message || "Error generating flashcards")
     } finally {
       setGeneratingFlashcards((prev) => ({ ...prev, [noteId]: false }))
     }
@@ -80,7 +89,7 @@ export default function NotesPage() {
 
   return (
     <div className="flex flex-col font-[family-name:var(--font-geist-sans)] h-full p-6 px-4">
-      <div className="flex gap-4 my-6">
+      <div className="flex gap-4 mb-6">
         <Select
           value={selectedCourse.toString()}
           onValueChange={(value) => {
@@ -124,7 +133,7 @@ export default function NotesPage() {
       <div className="flex flex-col lg:grid lg:grid-cols-2 xl:grid-cols-3 gap-4 py-12 h-full overflow-y-auto">
         {filteredNotes &&
           filteredNotes.map((note, index) => (
-            <Link href={`/notes/${note.id}`} key={index}>
+            <Link href={`/notes/${note.slug}`} key={index}>
               <Card className="col-span-1 row-span-1">
                 <CardHeader className="gap-2">
                   <CardTitle>{note.title}</CardTitle>

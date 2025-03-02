@@ -8,7 +8,9 @@ import {
   DrawerClose,
 } from "@kouza/ui/components/drawer"
 import {
+  BarChart,
   BicepsFlexed,
+  BookOpen,
   ChevronUp,
   FileStackIcon,
   FileText,
@@ -28,7 +30,11 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from "@kouza/ui/components/dropdown-menu"
-import { SidebarMenuButton } from "@kouza/ui/components/sidebar"
+import {
+  SidebarMenuButton,
+  SidebarMenuItem,
+} from "@kouza/ui/components/sidebar"
+import CourseDialog from "../dialogs/course"
 
 const items = [
   {
@@ -57,9 +63,14 @@ const items = [
     icon: FileStackIcon,
   },
   {
-    title: "Generate Course",
-    url: "/revise",
-    icon: BicepsFlexed,
+    title: "Progress",
+    url: "/progress",
+    icon: BarChart,
+  },
+  {
+    title: "Objectives",
+    url: "/objectives",
+    icon: BookOpen,
   },
 ]
 
@@ -92,13 +103,25 @@ export default function MobileSidebar({
                   </Link>
                 </DrawerClose>
               ))}
+              <DrawerClose asChild>
+                <CourseDialog>
+                  <SidebarMenuItem className="cursor-pointer">
+                    <SidebarMenuButton asChild>
+                      <div className="flex items-center gap-2 bg-black dark:bg-white text-white dark:text-black rounded-lg px-3 py-2 font-medium shadow-md hover:shadow-lg hover:bg-gray-900 hover:text-white dark:hover:bg-gray-100 transition-all border border-transparent dark:border-gray-200">
+                        <BicepsFlexed className="h-5 w-5" />
+                        <span>Generate Course</span>
+                      </div>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                </CourseDialog>
+              </DrawerClose>
             </div>
           </DrawerHeader>
           <div className="flex flex-col gap-4">
             <div className="p-4">
               {!isSubscribed && (
-                <div className="flex flex-col gap-4 bg-gray-100 border p-4 rounded-lg">
-                  <h4 className="text-md tracking-tight text-center">
+                <div className="flex flex-col gap-4 bg-gray-50 dark:bg-gray-900 border dark:border-gray-800 p-4 rounded-lg">
+                  <h4 className="text-md tracking-tight text-center text-gray-900 dark:text-gray-100">
                     You have{" "}
                     {3 <= courseCount
                       ? 0
