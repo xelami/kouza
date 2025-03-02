@@ -33,6 +33,7 @@ const personalities = [
   { id: "scholar", name: "Scholar" },
   { id: "mentor", name: "Mentor" },
   { id: "enthusiastic", name: "Enthusiastic" },
+  { id: "brainrot", name: "Brainrot" },
 ]
 
 interface AssistantFormProps {
