@@ -28,6 +28,64 @@ model User {
   notes            Note[]         @relation("UserNotes")
   sessions         Session[]
   subscriptions    Subscription[]
+  studySessions    StudySession[]
+  goals            LearningGoal[]
+  progressRecords  ProgressRecord[]
+}
+
+model StudySession {
+  id              Int            @id @default(autoincrement())
+  userId          Int
+  startTime       DateTime
+  endTime         DateTime?
+  duration        Int?     // In minutes, calculated on end
+  courseId        Int?
+  moduleId        Int?
+  lessonId        Int?
+  progressRecordId Int?
+  createdAt       DateTime       @default(now())
+  user            User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  course          Course?        @relation(fields: [courseId], references: [id])
+  module          Module?        @relation(fields: [moduleId], references: [id])
+  lesson          Lesson?        @relation(fields: [lessonId], references: [id])
+  progressRecord  ProgressRecord? @relation(fields: [progressRecordId], references: [id])
+}
+
+model LearningGoal {
+  id          Int          @id @default(autoincrement())
+  userId      Int
+  title       String
+  description String?
+  targetType  GoalType     // e.g., TIME, MASTERY, COMPLETION
+  targetValue Int          // e.g., 60 minutes, 80% mastery
+  deadline    DateTime?
+  achieved    Boolean      @default(false)
+  progress    Float        @default(0.0) // Percentage complete
+  courseId    Int?
+  moduleId    Int?
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  course      Course?      @relation(fields: [courseId], references: [id])
+  module      Module?      @relation(fields: [moduleId], references: [id])
+}
+
+model ProgressRecord {
+  id             Int           @id @default(autoincrement())
+  userId         Int
+  courseId       Int?
+  moduleId       Int?
+  lessonId       Int?
+  quizScore      Float?
+  retentionRate  Float?
+  timeSpent      Int?     
+  masteryScore   Float?   // Calculated topic mastery (0-100)
+  recordedAt     DateTime      @default(now())
+  user           User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  course         Course?       @relation(fields: [courseId], references: [id])
+  module         Module?       @relation(fields: [moduleId], references: [id])
+  lesson         Lesson?       @relation(fields: [lessonId], references: [id])
+  studySessions  StudySession[]
 }
 
 model Account {
@@ -81,6 +139,9 @@ model Course {
   flashcards  Flashcard[] @relation("CourseFlashcards")
   modules     Module[]
   notes       Note[]      @relation("CourseNotes")
+  studySessions StudySession[]
+  progressRecords ProgressRecord[]
+  learningGoals LearningGoal[]
 }
 
 model Module {
@@ -94,6 +155,9 @@ model Module {
   lessons     Lesson[]
   course      Course      @relation(fields: [courseId], references: [id])
   notes       Note[]      @relation("ModuleNotes")
+  studySessions StudySession[]
+  progressRecords ProgressRecord[]
+  learningGoals LearningGoal[]
 }
 
 model Lesson {
@@ -111,6 +175,8 @@ model Lesson {
   medias     Media[]
   notes      Note[]      @relation("LessonNotes")
   quizRecord Quiz?
+  studySessions StudySession[]
+  progressRecords ProgressRecord[]
 }
 
 model Flashcard {
@@ -139,6 +205,7 @@ model Flashcard {
 model Note {
   id          Int         @id @default(autoincrement())
   title       String
+  slug       String      @unique
   description String?
   content     String
   userId      Int
@@ -192,6 +259,12 @@ model Subscription {
   createdAt            DateTime           @default(now())
   updatedAt            DateTime           @updatedAt
   user                 User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+enum GoalType {
+  TIME     
+  MASTERY  
+  COMPLETION
 }
 
 enum CourseType {
