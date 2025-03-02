@@ -3,6 +3,8 @@ import { isUserSubscribed } from "@/hooks/is-subscribed"
 import { db } from "@kouza/db"
 import { NextResponse } from "next/server"
 
+export const runtime = "edge"
+
 export async function POST(request: Request) {
   try {
     const session = await auth()

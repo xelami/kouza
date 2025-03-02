@@ -3,6 +3,8 @@ import { db } from "@kouza/db"
 import { NextResponse } from "next/server"
 import { updateLearningGoals } from "@/app/actions/update-learning-goals"
 
+export const runtime = "edge"
+
 export async function POST(request: Request) {
   try {
     const session = await auth()
