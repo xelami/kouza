@@ -2,8 +2,6 @@
 
 import { db } from "@kouza/db"
 
-export const runtime = "edge"
-
 interface Flashcard {
   user: any
   id: number

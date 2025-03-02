@@ -3,8 +3,6 @@
 import { db } from "@kouza/db"
 import { auth } from "@/auth"
 
-export const runtime = "edge"
-
 export async function checkExistingFlashcards(
   lessonId?: number,
   noteId?: number

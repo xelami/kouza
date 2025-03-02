@@ -3,8 +3,6 @@
 import { auth } from "@/auth"
 import { db } from "@kouza/db"
 
-export const runtime = "edge"
-
 export async function getFlashcards() {
   const session = await auth()
   const user = session?.user

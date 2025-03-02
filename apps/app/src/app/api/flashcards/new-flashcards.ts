@@ -8,8 +8,6 @@ import { generateObject } from "ai"
 import { NextResponse } from "next/server"
 import { z } from "zod"
 
-export const runtime = "edge"
-
 const openai = createOpenAI({
   apiKey: process.env.OPENAI_API_KEY,
   compatibility: "strict",
