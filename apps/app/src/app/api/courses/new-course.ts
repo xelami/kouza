@@ -58,11 +58,6 @@ const lessonContentSchema = z.object({
   }),
 })
 
-type PrismaError = {
-  code: string
-  message: string
-}
-
 const freePrompt = (prompt: string) =>
   `Create a concise course outline based on: ${prompt}. Include up to 5 modules. Slug should be shortened version of title in lowercase. Module slugs should be shortened version of module title in lowercase.`
 const subscribedPrompt = (prompt: string) =>
@@ -72,24 +67,6 @@ const freeModulePrompt = (moduleTitle: string) =>
   `Create strictly up to 3 lessons for the module "${moduleTitle}". Keep descriptions brief. Slug should be shortened version of lesson title in lowercase.`
 const subscribedModulePrompt = (moduleTitle: string) =>
   `Create as many lessons as possible for the module "${moduleTitle}". Keep descriptions brief. Slug should be shortened version of lesson title in lowercase.`
-
-async function retryOperation<T>(
-  operation: () => Promise<T>,
-  maxRetries = 3
-): Promise<T> {
-  let lastError
-  for (let attempt = 1; attempt <= maxRetries; attempt++) {
-    try {
-      return await operation()
-    } catch (error) {
-      lastError = error
-      console.log(`Attempt ${attempt} failed, retrying...`)
-      // Exponential backoff
-      await new Promise((r) => setTimeout(r, 1000 * Math.pow(2, attempt - 1)))
-    }
-  }
-  throw lastError
-}
 
 export async function newCourse(prompt: string) {
   const session = await auth()
@@ -157,14 +134,12 @@ export async function newCourse(prompt: string) {
       }
     }
 
-    const courseResult = await retryOperation(() =>
-      generateObject({
-        model: openai("gpt-4o-mini", { structuredOutputs: true }),
-        schemaName: "course",
-        schema: courseSchema,
-        prompt: userSubscribed ? subscribedPrompt(prompt) : freePrompt(prompt),
-      })
-    )
+    const courseResult = await generateObject({
+      model: openai("gpt-4o-mini", { structuredOutputs: true }),
+      schemaName: "course",
+      schema: courseSchema,
+      prompt: userSubscribed ? subscribedPrompt(prompt) : freePrompt(prompt),
+    })
 
     if (!courseResult?.object) {
       throw new Error("Failed to generate course structure")
@@ -202,16 +177,14 @@ export async function newCourse(prompt: string) {
       courseModules.map(
         async (courseModule: CourseModule, moduleIndex: number) => {
           try {
-            const lessonsResult = await retryOperation(() =>
-              generateObject({
-                model: openai("gpt-4o-mini", { structuredOutputs: true }),
-                schemaName: "moduleLessons",
-                schema: moduleLessonsSchema,
-                prompt: userSubscribed
-                  ? subscribedModulePrompt(courseModule.title)
-                  : freeModulePrompt(courseModule.title),
-              })
-            )
+            const lessonsResult = await generateObject({
+              model: openai("gpt-4o-mini", { structuredOutputs: true }),
+              schemaName: "moduleLessons",
+              schema: moduleLessonsSchema,
+              prompt: userSubscribed
+                ? subscribedModulePrompt(courseModule.title)
+                : freeModulePrompt(courseModule.title),
+            })
 
             if (!lessonsResult?.object?.lessons) {
               throw new Error(
@@ -227,29 +200,20 @@ export async function newCourse(prompt: string) {
             ) {
               const lesson = lessonsResult.object.lessons[lessonIndex]
 
-              let baseSlug = lesson?.slug + "-" + userId
-              let uniqueSlug = baseSlug
-              let counter = 1
-              while (
-                await db.lesson.findUnique({ where: { slug: uniqueSlug } })
-              ) {
-                uniqueSlug = `${lesson?.slug}-${userId}-${counter}`
-                counter++
-              }
+              let randomString = Math.random().toString(36).substring(2, 5)
+              let uniqueSlug = `${lesson?.slug}-${userId}-${randomString}`
 
-              const contentResult = await retryOperation(() =>
-                generateObject({
-                  model: openai("gpt-4o-mini", { structuredOutputs: true }),
-                  schemaName: "lessonContent",
-                  schema: lessonContentSchema,
-                  prompt: `Create detailed educational content for lesson "${lesson?.title}". 
+              const contentResult = await generateObject({
+                model: openai("gpt-4o-mini", { structuredOutputs: true }),
+                schemaName: "lessonContent",
+                schema: lessonContentSchema,
+                prompt: `Create detailed educational content for lesson "${lesson?.title}". 
                   The content should be at least 2000 words and focus purely on teaching the material.
                   DO NOT include any quiz questions, exercises, or test material in the content section.
                   The quiz section will be handled separately in the quiz object.
                   After generating the main content, create a separate comprehensive quiz with multiple questions to test understanding.
                   Each quiz question must have exactly 4 options.`,
-                })
-              )
+              })
 
               try {
                 const courseLesson = await db.lesson.create({
@@ -266,15 +230,10 @@ export async function newCourse(prompt: string) {
                   },
                 })
                 dbLessons.push(courseLesson)
-              } catch (error) {
-                if ((error as PrismaError).code === "P2002") {
-                  console.error(
-                    `Unique constraint failed for slug: ${uniqueSlug}. Retrying...`
-                  )
-                }
+              } catch (error: any) {
                 console.error(
                   `Error creating lesson "${lesson?.title}":`,
-                  (error as Error).message
+                  error.message
                 )
               }
             }

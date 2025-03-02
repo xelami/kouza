@@ -45,25 +45,6 @@ export default function NewCourseForm({
     },
   })
 
-  async function createFullCourse(prompt: string) {
-    const response = await fetch("/api/courses/initialize", {
-      method: "POST",
-      body: JSON.stringify({ prompt }),
-    })
-
-    const { courseId, modules } = await response.json()
-
-    // Step 2: Process each module sequentially
-    for (const module of modules) {
-      await fetch("/api/courses/process-module", {
-        method: "POST",
-        body: JSON.stringify({ courseId, moduleId: module.id }),
-      })
-    }
-
-    return { courseId }
-  }
-
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsSubmitted(true)
     toast.success("Course creation started", {
@@ -72,12 +53,11 @@ export default function NewCourseForm({
     })
 
     try {
-      // await newCourse(values.prompt)
       toast.success("Course creation started", {
         description:
           "Modules and lessons will be populated over the next few minutes. You can continue browsing while this happens.",
       })
-      await createFullCourse(values.prompt)
+      await newCourse(values.prompt)
     } catch (error: any) {
       toast.error(error.message)
     }
