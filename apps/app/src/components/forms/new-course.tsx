@@ -16,10 +16,10 @@ import { Button } from "@kouza/ui/components/button"
 import { z } from "zod"
 import { newCourse } from "@/app/api/courses/new-course"
 import { toast } from "sonner"
-import { isUserSubscribed } from "@/hooks/use-subscription"
 import { newLessons } from "@/app/api/courses/new-lessons"
-
-export const runtime = "edge"
+// import { isUserSubscribed } from "@/hooks/use-subscription"
+// import { db } from "@kouza/db"
+// import { auth } from "@/auth"
 
 const formSchema = z.object({
   prompt: z.string().min(2).max(100),

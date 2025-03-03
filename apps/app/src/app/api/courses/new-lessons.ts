@@ -2,7 +2,7 @@
 
 import { auth } from "@/auth"
 import { isUserSubscribed } from "@/hooks/is-subscribed"
-import { CourseModule, Lesson } from "@/types/types"
+import { CourseModule } from "@/types/types"
 import { createOpenAI } from "@ai-sdk/openai"
 import { db } from "@kouza/db"
 import { generateObject } from "ai"
@@ -128,61 +128,93 @@ export async function newLessons(module: CourseModule) {
       throw new Error(`Failed to generate lessons for module ${module.title}`)
     }
 
-    const dbLessons = []
-    for (
-      let lessonIndex = 0;
-      lessonIndex < lessonsResult.object.lessons.length;
-      lessonIndex++
-    ) {
-      const lesson = lessonsResult.object.lessons[lessonIndex]
+    const lessons = lessonsResult.object.lessons
+    if (!lessons.length)
+      throw new Error(`No lessons generated for ${module.title}`)
 
-      let randomString = Math.random().toString(36).substring(2, 5)
-      let uniqueSlug = `${lesson?.slug}-${userId}-${randomString}`
-
-      const contentResult = await generateObject({
+    const contentPromises = lessons.map((lesson) =>
+      generateObject({
         model: openai("gpt-4o-mini", { structuredOutputs: true }),
-        schemaName: "lessonContent",
         schema: lessonContentSchema,
-        prompt: `Create detailed educational content for lesson "${lesson?.title}".
-          The content should be at least 2000 words and focus purely on teaching the material.
-          DO NOT include any quiz questions, exercises, or test material in the content section.
-          The quiz section will be handled separately in the quiz object.
-          After generating the main content, create a separate comprehensive quiz with multiple questions to test understanding.
-          Each quiz question must have exactly 4 options.`,
-      })
+        prompt: userSubscribed
+          ? subscribedModulePrompt(lesson.title)
+          : freeModulePrompt(lesson.title),
+      }).then((result) => ({
+        moduleId: module.id,
+        title: lesson.title,
+        slug: `${lesson.slug}-${userId}-${Math.random().toString(36).slice(2, 5)}`,
+        content: result.object.content,
+        quiz: result.object.quiz,
+        order: lesson.order,
+      }))
+    )
 
-      try {
-        const courseLesson = await db.lesson.create({
-          data: {
-            moduleId: module.id,
-            title: lesson?.title || "",
-            slug: uniqueSlug,
-            content:
-              contentResult?.object?.content || "Content generation failed",
-            media: contentResult?.object?.media || [],
-            order: lessonIndex,
-            quiz: contentResult?.object?.quiz || { questions: [] },
-          },
-        })
-        dbLessons.push(courseLesson)
-      } catch (error: any) {
-        console.error(
-          `Error creating lesson "${lesson?.title}":`,
-          error.message
-        )
-      }
-    }
+    const lessonData = await Promise.all(contentPromises)
+    await db.lesson.createMany({
+      data: lessonData,
+      skipDuplicates: true,
+    })
 
     await db.module.update({
       where: { id: module.id },
-      data: {
-        lessons: {
-          connect: dbLessons.map((lesson: Lesson) => ({
-            id: lesson.id,
-          })),
-        },
-      },
+      data: { lessons: { connect: lessonData.map((l) => ({ slug: l.slug })) } },
     })
+
+    // const dbLessons = []
+    // for (
+    //   let lessonIndex = 0;
+    //   lessonIndex < lessonsResult.object.lessons.length;
+    //   lessonIndex++
+    // ) {
+    //   const lesson = lessonsResult.object.lessons[lessonIndex]
+
+    //   let randomString = Math.random().toString(36).substring(2, 5)
+    //   let uniqueSlug = `${lesson?.slug}-${userId}-${randomString}`
+
+    //   const contentResult = await generateObject({
+    //     model: openai("gpt-4o-mini", { structuredOutputs: true }),
+    //     schemaName: "lessonContent",
+    //     schema: lessonContentSchema,
+    //     prompt: `Create detailed educational content for lesson "${lesson?.title}".
+    //       The content should be at least 2000 words and focus purely on teaching the material.
+    //       DO NOT include any quiz questions, exercises, or test material in the content section.
+    //       The quiz section will be handled separately in the quiz object.
+    //       After generating the main content, create a separate comprehensive quiz with multiple questions to test understanding.
+    //       Each quiz question must have exactly 4 options.`,
+    //   })
+
+    //   try {
+    //     const courseLesson = await db.lesson.create({
+    //       data: {
+    //         moduleId: module.id,
+    //         title: lesson?.title || "",
+    //         slug: uniqueSlug,
+    //         content:
+    //           contentResult?.object?.content || "Content generation failed",
+    //         media: contentResult?.object?.media || [],
+    //         order: lessonIndex,
+    //         quiz: contentResult?.object?.quiz || { questions: [] },
+    //       },
+    //     })
+    //     dbLessons.push(courseLesson)
+    //   } catch (error: any) {
+    //     console.error(
+    //       `Error creating lesson "${lesson?.title}":`,
+    //       error.message
+    //     )
+    //   }
+    // }
+
+    // await db.module.update({
+    //   where: { id: module.id },
+    //   data: {
+    //     lessons: {
+    //       connect: dbLessons.map((lesson: Lesson) => ({
+    //         id: lesson.id,
+    //       })),
+    //     },
+    //   },
+    // })
 
     return {
       message: "Lessons created",

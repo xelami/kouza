@@ -2,7 +2,6 @@
 
 import { auth } from "@/auth"
 import { isUserSubscribed } from "@/hooks/is-subscribed"
-// import { CourseModule, Lesson } from "@/types/types"
 import { createOpenAI } from "@ai-sdk/openai"
 import { db } from "@kouza/db"
 import { generateObject } from "ai"
@@ -27,46 +26,10 @@ const courseSchema = z.object({
   ),
 })
 
-// const moduleLessonsSchema = z.object({
-//   lessons: z.array(
-//     z.object({
-//       title: z.string(),
-//       slug: z.string(),
-//       description: z.string(),
-//       order: z.number(),
-//     })
-//   ),
-// })
-
-// const lessonContentSchema = z.object({
-//   content: z.string(),
-//   media: z.array(
-//     z.object({
-//       type: z.string(),
-//       url: z.string(),
-//       caption: z.string(),
-//     })
-//   ),
-//   quiz: z.object({
-//     questions: z.array(
-//       z.object({
-//         question: z.string(),
-//         options: z.array(z.string()),
-//         correctAnswer: z.number(),
-//       })
-//     ),
-//   }),
-// })
-
 const freePrompt = (prompt: string) =>
   `Create a concise course outline based on: ${prompt}. Include up to 5 modules. Slug should be shortened version of title in lowercase. Module slugs should be shortened version of module title in lowercase.`
 const subscribedPrompt = (prompt: string) =>
   `Create a concise course outline based on: ${prompt}. Include as many modules as possible. Slug should be shortened version of title in lowercase. Module slugs should be shortened version of module title in lowercase.`
-
-// const freeModulePrompt = (moduleTitle: string) =>
-//   `Create strictly up to 3 lessons for the module "${moduleTitle}". Keep descriptions brief. Slug should be shortened version of lesson title in lowercase.`
-// const subscribedModulePrompt = (moduleTitle: string) =>
-//   `Create as many lessons as possible for the module "${moduleTitle}". Keep descriptions brief. Slug should be shortened version of lesson title in lowercase.`
 
 export async function newCourse(prompt: string) {
   const session = await auth()
@@ -78,61 +41,6 @@ export async function newCourse(prompt: string) {
 
   try {
     const userSubscribed = await isUserSubscribed(Number(userId))
-
-    const subscription = await db.subscription.findFirst({
-      where: {
-        userId: Number(userId),
-        OR: [
-          {
-            status: "ACTIVE",
-            currentPeriodEnd: {
-              gt: new Date(),
-            },
-          },
-          {
-            status: "CANCELED",
-            currentPeriodEnd: {
-              gt: new Date(),
-            },
-          },
-        ],
-      },
-      orderBy: {
-        currentPeriodStart: "desc",
-      },
-    })
-
-    if (!userSubscribed) {
-      const courses = await db.course.findMany({
-        where: {
-          generatedBy: Number(userId),
-        },
-      })
-
-      if (courses.length >= 3) {
-        throw new Error(
-          "You have reached the maximum number of free courses. Subscribe to generate up to 10 full length courses per month!"
-        )
-      }
-    } else {
-      const coursesThisMonth = await db.course.findMany({
-        where: {
-          generatedBy: Number(userId),
-          type: "FULL",
-          createdAt: {
-            gte:
-              subscription?.currentPeriodStart ??
-              new Date(new Date().setMonth(new Date().getMonth() - 1)),
-          },
-        },
-      })
-
-      if (coursesThisMonth.length >= 10) {
-        throw new Error(
-          "You have reached the maximum number of courses available this month."
-        )
-      }
-    }
 
     const courseResult = await generateObject({
       model: openai("gpt-4o-mini", { structuredOutputs: true }),
