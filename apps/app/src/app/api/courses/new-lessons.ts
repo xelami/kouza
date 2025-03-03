@@ -136,9 +136,12 @@ export async function newLessons(module: CourseModule) {
       generateObject({
         model: openai("gpt-4o-mini", { structuredOutputs: true }),
         schema: lessonContentSchema,
-        prompt: userSubscribed
-          ? subscribedModulePrompt(lesson.title)
-          : freeModulePrompt(lesson.title),
+        prompt: `Create detailed educational content for lesson "${lesson?.title}".
+           The content should be at least 2000 words and focus purely on teaching the material.
+           DO NOT include any quiz questions, exercises, or test material in the content section.
+           The quiz section will be handled separately in the quiz object.
+           After generating the main content, create a separate comprehensive quiz with multiple questions to test understanding.
+           Each quiz question must have exactly 4 options.`,
       }).then((result) => ({
         moduleId: module.id,
         title: lesson.title,
