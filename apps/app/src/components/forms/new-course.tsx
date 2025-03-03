@@ -16,6 +16,8 @@ import { Button } from "@kouza/ui/components/button"
 import { z } from "zod"
 import { newCourse } from "@/app/api/courses/new-course"
 import { toast } from "sonner"
+import { isUserSubscribed } from "@/hooks/use-subscription"
+import { newLessons } from "@/app/api/courses/new-lessons"
 
 export const runtime = "edge"
 
@@ -57,7 +59,13 @@ export default function NewCourseForm({
         description:
           "Modules and lessons will be populated over the next few minutes. You can continue browsing while this happens.",
       })
-      await newCourse(values.prompt)
+      const { modules } = await newCourse(values.prompt)
+
+      for (const module of modules) {
+        await newLessons(module)
+      }
+
+      toast.success("Course creation completed")
     } catch (error: any) {
       toast.error(error.message)
     }
