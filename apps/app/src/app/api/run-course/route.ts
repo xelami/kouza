@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server"
 import { newCourse } from "@/app/api/courses/new-course"
-import { auth } from "@/auth"
 
 export const runtime = "edge"
 
@@ -11,7 +10,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Invalid prompt" }, { status: 400 })
   }
 
-  const taskPromise = newCourse(prompt, userId).catch((error) => {
+  newCourse(prompt, userId).catch((error) => {
     console.error("Course creation failed:", error)
   })
 
