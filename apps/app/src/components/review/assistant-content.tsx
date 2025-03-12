@@ -13,12 +13,14 @@ interface Message {
 }
 
 interface AssistantContentProps {
+  lessonTitle: string
   context?: string
   isSubscribed: boolean
   onContextCleared?: () => void
 }
 
 export default function AssistantContent({
+  lessonTitle,
   context,
   isSubscribed,
   onContextCleared,
@@ -99,6 +101,7 @@ export default function AssistantContent({
       </div>
       <div className="sticky bottom-0 border-t bg-background p-4">
         <AssistantForm
+          lessonTitle={lessonTitle}
           context={context}
           onContextCleared={onContextCleared}
           onMessageSent={(content) => {

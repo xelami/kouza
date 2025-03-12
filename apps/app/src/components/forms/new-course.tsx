@@ -16,8 +16,10 @@ import { Button } from "@kouza/ui/components/button"
 import { z } from "zod"
 import { newCourse } from "@/app/api/courses/new-course"
 import { toast } from "sonner"
-
-export const runtime = "edge"
+import { newLessons } from "@/app/api/courses/new-lessons"
+// import { isUserSubscribed } from "@/hooks/use-subscription"
+// import { db } from "@kouza/db"
+// import { auth } from "@/auth"
 
 const formSchema = z.object({
   prompt: z.string().min(2).max(100),
@@ -53,6 +55,7 @@ export default function NewCourseForm({
     })
 
     try {
+<<<<<<< HEAD
       const response = await fetch("/api/queue-course", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -64,6 +67,19 @@ export default function NewCourseForm({
       }
 
       // await newCourse(values.prompt)
+=======
+      toast.success("Course creation started", {
+        description:
+          "Modules and lessons will be populated over the next few minutes. You can continue browsing while this happens.",
+      })
+      const { modules } = await newCourse(values.prompt)
+
+      for (const module of modules) {
+        await newLessons(module)
+      }
+
+      toast.success("Course creation completed")
+>>>>>>> 17b4ba5b70b59f962fc36752f115035752bdebd7
     } catch (error: any) {
       toast.error(error.message)
       setIsSubmitted(false)

@@ -11,9 +11,11 @@ export const runtime = "edge"
 export default function ASidebar({
   context,
   onContextCleared,
+  lessonTitle,
 }: {
   context?: string
   onContextCleared?: () => void
+  lessonTitle: string
 }) {
   const [isSubscribed, setIsSubscribed] = useState(false)
   const { data: session } = useSession()
@@ -45,6 +47,7 @@ export default function ASidebar({
         context={context}
         isSubscribed={isSubscribed}
         onContextCleared={onContextCleared}
+        lessonTitle={lessonTitle}
       />
     </div>
   )

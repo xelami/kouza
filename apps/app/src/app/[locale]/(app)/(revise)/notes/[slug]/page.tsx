@@ -10,14 +10,14 @@ export const runtime = "edge"
 export default async function NotePage({
   params,
 }: {
-  params: Promise<{ id: string }>
+  params: Promise<{ slug: string }>
 }) {
   const session = await auth()
-  const { id } = await params
+  const { slug } = await params
 
   const note = await db.note.findUnique({
     where: {
-      id: Number(id),
+      slug: slug,
     },
     include: {
       module: true,
@@ -37,7 +37,7 @@ export default async function NotePage({
   return (
     <div className="flex flex-col font-[family-name:var(--font-geist-sans)] h-full p-6 px-4">
       <div>
-        <div className="flex gap-8 mt-4 tracking-tight">
+        <div className="flex gap-8 my-4 tracking-tight">
           <div className="flex flex-col items-center gap-2">
             <Link
               className="flex flex-col items-center"

@@ -10,8 +10,6 @@ export async function POST(req: Request) {
   try {
     const { email, url } = await req.json()
 
-    console.log("Attempting to send email to:", email)
-
     if (!email || !url) {
       console.error("Missing required fields:", { email, url })
       return NextResponse.json(
@@ -40,7 +38,6 @@ export async function POST(req: Request) {
       )
     }
 
-    console.log("Email sent successfully:", { email, data })
     return NextResponse.json({ success: true, data })
   } catch (error) {
     console.error("Unexpected error in email sending:", error)

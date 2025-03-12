@@ -33,9 +33,11 @@ const personalities = [
   { id: "scholar", name: "Scholar" },
   { id: "mentor", name: "Mentor" },
   { id: "enthusiastic", name: "Enthusiastic" },
+  { id: "brainrot", name: "Brainrot" },
 ]
 
 interface AssistantFormProps {
+  lessonTitle?: string
   context?: string
   onMessageSent: (prompt: string) => void
   onResponseReceived: (response: string) => void
@@ -43,6 +45,7 @@ interface AssistantFormProps {
 }
 
 export default function AssistantForm({
+  lessonTitle,
   context,
   onMessageSent,
   onResponseReceived,
@@ -60,14 +63,15 @@ export default function AssistantForm({
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true)
-    const currentContext = context // Store current context before clearing
-    onContextCleared?.() // Clear context immediately when submitting
+    const currentContext = context
+    onContextCleared?.()
     try {
       onMessageSent(values.prompt)
       const res = await addContext(
         values.prompt,
         currentContext,
-        values.personality
+        values.personality,
+        lessonTitle
       )
       const { object } = res
       onResponseReceived(object.content)

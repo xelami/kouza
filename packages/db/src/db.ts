@@ -13,7 +13,7 @@ neonConfig.poolQueryViaFetch = true
 
 const createPrismaClient = () => {
   const connectionString = process.env.DATABASE_URL
-  const pool = new Pool({ connectionString })
+  const pool = new Pool({ connectionString, max: 900 })
   const adapter = new PrismaNeon(pool)
 
   return new PrismaClient({

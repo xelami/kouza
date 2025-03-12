@@ -5,6 +5,7 @@ import { isUserSubscribed } from "@/hooks/is-subscribed"
 import { createOpenAI } from "@ai-sdk/openai"
 import { db } from "@kouza/db"
 import { generateObject } from "ai"
+import { NextResponse } from "next/server"
 import { z } from "zod"
 
 const openai = createOpenAI({
@@ -31,7 +32,7 @@ export async function newFlashcards({ noteId, lessonId }: FlashcardInput) {
   const userId = session?.user?.id
 
   if (!userId) {
-    throw new Error("User not found")
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
   }
 
   const userSubscribed = await isUserSubscribed(Number(userId))
@@ -59,6 +60,16 @@ export async function newFlashcards({ noteId, lessonId }: FlashcardInput) {
   let courseId: number
 
   if (noteId) {
+    const existingFlashcards = await db.flashcard.findMany({
+      where: {
+        noteId: noteId,
+      },
+    })
+
+    if (existingFlashcards && existingFlashcards.length > 0) {
+      throw new Error("Flashcards already exist for this note")
+    }
+
     const note = await db.note.findUnique({
       where: { id: noteId },
       include: {
@@ -86,31 +97,19 @@ export async function newFlashcards({ noteId, lessonId }: FlashcardInput) {
     content = lesson.content || ""
     moduleId = lesson.moduleId
     courseId = lesson.module.courseId
-  }
 
-  let existingFlashcards = null
-  if (noteId) {
-    existingFlashcards = await db.flashcard.findFirst({
+    const existingFlashcards = await db.flashcard.findMany({
       where: {
-        noteId: noteId,
+        lessonId: lessonId,
+        userId: parseInt(userId),
+        moduleId,
+        courseId,
       },
     })
-  } else if (lessonId) {
-    existingFlashcards = await db.flashcard.findFirst({
-      where: {
-        noteId: noteId,
-        AND: [
-          { userId: parseInt(userId) },
-          { moduleId },
-          { courseId },
-          { lessonId },
-        ],
-      },
-    })
-  }
 
-  if (existingFlashcards) {
-    throw new Error("Flashcards already exist for this content")
+    if (existingFlashcards && existingFlashcards.length > 0) {
+      throw new Error("Flashcards already exist for this lesson")
+    }
   }
 
   const flashcardsResult = await generateObject({

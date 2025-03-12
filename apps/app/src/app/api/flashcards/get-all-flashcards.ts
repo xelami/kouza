@@ -1,8 +1,7 @@
 "use server"
 
 import { auth } from "@/auth"
-import { db, Flashcard } from "@kouza/db"
-import { DbFlashcard } from "@/types/types"
+import { db } from "@kouza/db"
 
 export async function getFlashcards() {
   const session = await auth()
@@ -25,7 +24,7 @@ export async function getFlashcards() {
   })
 
   const grouped = flashcards.reduce(
-    (acc: Record<number, DbFlashcard[]>, fc: DbFlashcard) => {
+    (acc: Record<number, any[]>, fc: any) => {
       const courseId = fc.course.id
       if (!acc[courseId]) {
         acc[courseId] = []
@@ -37,10 +36,10 @@ export async function getFlashcards() {
   )
 
   const result = Object.entries(grouped).map(
-    ([courseId, groupFlashcards]: [string, DbFlashcard[]]) => {
+    ([courseId, groupFlashcards]: [string, any[]]) => {
       const totalCards = groupFlashcards.length
       const reviewed = groupFlashcards.filter(
-        (fc: DbFlashcard) => fc.lastReviewed !== null
+        (fc: any) => fc.lastReviewed !== null
       ).length
       const toReview = totalCards - reviewed
       const course = groupFlashcards[0]?.course

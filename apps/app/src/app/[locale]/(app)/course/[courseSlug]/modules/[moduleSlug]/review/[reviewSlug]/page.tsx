@@ -188,7 +188,11 @@ export default function ReviewPage({
         </div>
 
         <div className="flex flex-col items-center">
-          <QuizComponent quiz={lesson?.quiz} />
+          <QuizComponent
+            quiz={lesson?.quiz}
+            courseId={lesson?.module?.course?.id}
+            moduleId={lesson?.module?.id}
+          />
         </div>
         <div className="flex flex-row justify-between p-8">
           <Link
@@ -209,6 +213,7 @@ export default function ReviewPage({
       </div>
       <div className="hidden xl:block h-screen sticky top-0 border-l border-gray-200">
         <ASidebar
+          lessonTitle={lesson?.title}
           context={assistantContext}
           onContextCleared={() => setAssistantContext("")}
         />
