@@ -9,6 +9,8 @@ export async function POST(request: Request, { params }: { params: any }) {
     return NextResponse.json({ error: "Invalid prompt" }, { status: 400 })
   }
 
+  const url = "https://app.kouza-ai.com/api/run-course"
+
   const session = await auth()
   const userId = session?.user?.id
 
@@ -19,7 +21,7 @@ export async function POST(request: Request, { params }: { params: any }) {
     )
   }
 
-  fetch("/api/run-course", {
+  fetch(url, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ prompt, userId }),
