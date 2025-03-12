@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server"
 import { auth } from "@/auth"
+import { newCourse } from "../courses/new-course"
 export const runtime = "edge"
 
 export async function POST(request: Request, { params }: { params: any }) {
@@ -8,8 +9,6 @@ export async function POST(request: Request, { params }: { params: any }) {
   if (!prompt || typeof prompt !== "string") {
     return NextResponse.json({ error: "Invalid prompt" }, { status: 400 })
   }
-
-  const url = "https://app.kouza-ai.com/api/run-course"
 
   const session = await auth()
   const userId = session?.user?.id
@@ -21,14 +20,9 @@ export async function POST(request: Request, { params }: { params: any }) {
     )
   }
 
-  fetch(url, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ prompt, userId }),
-    keepalive: true,
-  }).catch((error) => {
-    console.error("Failed to trigger background task:", error)
-  })
+  newCourse(prompt, userId)
+    .then(() => console.log("Course creation completed successfully"))
+    .catch((error) => console.error("Course creation failed:", error))
 
   return NextResponse.json(
     { message: "Course creation started" },
