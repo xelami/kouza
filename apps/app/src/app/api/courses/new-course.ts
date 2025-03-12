@@ -73,10 +73,7 @@ const freeModulePrompt = (moduleTitle: string) =>
 const subscribedModulePrompt = (moduleTitle: string) =>
   `Create as many lessons as possible for the module "${moduleTitle}". Keep descriptions brief. Slug should be shortened version of lesson title in lowercase.`
 
-export async function newCourse(prompt: string) {
-  const session = await auth()
-  const userId = session?.user?.id
-
+export async function newCourse(prompt: string, userId: string) {
   if (!userId) {
     throw new Error("User not found")
   }

@@ -53,9 +53,20 @@ export default function NewCourseForm({
     })
 
     try {
-      await newCourse(values.prompt)
+      const response = await fetch("/api/queue-course", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ prompt: values.prompt }),
+      })
+
+      if (!response.ok) {
+        throw new Error("Failed to start course creation")
+      }
+
+      // await newCourse(values.prompt)
     } catch (error: any) {
       toast.error(error.message)
+      setIsSubmitted(false)
     }
   }
 

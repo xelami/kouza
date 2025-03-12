@@ -24,8 +24,6 @@ export default async function CoursesPage() {
 
   const courses = await getCourses(Number(userId))
 
-  console.log(courses)
-
   return (
     <div className="flex flex-col font-[family-name:var(--font-geist-sans)] h-full p-6 px-4">
       {courses.length ? (
