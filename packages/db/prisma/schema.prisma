@@ -45,10 +45,10 @@ model StudySession {
   progressRecordId Int?
   createdAt       DateTime       @default(now())
   user            User           @relation(fields: [userId], references: [id], onDelete: Cascade)
-  course          Course?        @relation(fields: [courseId], references: [id])
-  module          Module?        @relation(fields: [moduleId], references: [id])
-  lesson          Lesson?        @relation(fields: [lessonId], references: [id])
-  progressRecord  ProgressRecord? @relation(fields: [progressRecordId], references: [id])
+  course          Course?        @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  module          Module?        @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  lesson          Lesson?        @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  progressRecord  ProgressRecord? @relation(fields: [progressRecordId], references: [id], onDelete: SetNull)
 }
 
 model LearningGoal {
@@ -66,8 +66,8 @@ model LearningGoal {
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
   user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
-  course      Course?      @relation(fields: [courseId], references: [id])
-  module      Module?      @relation(fields: [moduleId], references: [id])
+  course      Course?      @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  module      Module?      @relation(fields: [moduleId], references: [id], onDelete: Cascade)
 }
 
 model ProgressRecord {
@@ -82,9 +82,9 @@ model ProgressRecord {
   masteryScore   Float?   // Calculated topic mastery (0-100)
   recordedAt     DateTime      @default(now())
   user           User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-  course         Course?       @relation(fields: [courseId], references: [id])
-  module         Module?       @relation(fields: [moduleId], references: [id])
-  lesson         Lesson?       @relation(fields: [lessonId], references: [id])
+  course         Course?       @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  module         Module?       @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  lesson         Lesson?       @relation(fields: [lessonId], references: [id], onDelete: Cascade)
   studySessions  StudySession[]
 }
 
@@ -153,7 +153,7 @@ model Module {
   order       Int
   flashcards  Flashcard[] @relation("ModuleFlashcards")
   lessons     Lesson[]
-  course      Course      @relation(fields: [courseId], references: [id])
+  course      Course      @relation(fields: [courseId], references: [id], onDelete: Cascade)
   notes       Note[]      @relation("ModuleNotes")
   studySessions StudySession[]
   progressRecords ProgressRecord[]
@@ -171,7 +171,7 @@ model Lesson {
   quiz       Json
   completed  Boolean     @default(false)
   flashcards Flashcard[] @relation("LessonFlashcards")
-  module     Module      @relation(fields: [moduleId], references: [id])
+  module     Module      @relation(fields: [moduleId], references: [id], onDelete: Cascade)
   medias     Media[]
   notes      Note[]      @relation("LessonNotes")
   quizRecord Quiz?
@@ -195,10 +195,10 @@ model Flashcard {
   lessonId     Int
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
-  course       Course    @relation("CourseFlashcards", fields: [courseId], references: [id])
-  lesson       Lesson    @relation("LessonFlashcards", fields: [lessonId], references: [id])
-  module       Module    @relation("ModuleFlashcards", fields: [moduleId], references: [id])
-  note         Note?     @relation("NoteFlashcards", fields: [noteId], references: [id])
+  course       Course    @relation("CourseFlashcards", fields: [courseId], references: [id], onDelete: Cascade)
+  lesson       Lesson    @relation("LessonFlashcards", fields: [lessonId], references: [id], onDelete: Cascade)
+  module       Module    @relation("ModuleFlashcards", fields: [moduleId], references: [id], onDelete: Cascade)
+  note         Note?     @relation("NoteFlashcards", fields: [noteId], references: [id], onDelete: SetNull)
   user         User      @relation("UserFlashcards", fields: [userId], references: [id], onDelete: Cascade)
 }
 
@@ -215,16 +215,16 @@ model Note {
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
   flashcards  Flashcard[] @relation("NoteFlashcards")
-  course      Course      @relation("CourseNotes", fields: [courseId], references: [id])
-  lesson      Lesson      @relation("LessonNotes", fields: [lessonId], references: [id])
-  module      Module      @relation("ModuleNotes", fields: [moduleId], references: [id])
+  course      Course      @relation("CourseNotes", fields: [courseId], references: [id], onDelete: Cascade)
+  lesson      Lesson      @relation("LessonNotes", fields: [lessonId], references: [id], onDelete: Cascade)
+  module      Module      @relation("ModuleNotes", fields: [moduleId], references: [id], onDelete: Cascade)
   user        User        @relation("UserNotes", fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Quiz {
   id        Int            @id @default(autoincrement())
   lessonId  Int            @unique
-  lesson    Lesson         @relation(fields: [lessonId], references: [id])
+  lesson    Lesson         @relation(fields: [lessonId], references: [id], onDelete: Cascade)
   questions QuizQuestion[]
 }
 
@@ -234,7 +234,7 @@ model QuizQuestion {
   question      String
   options       String[]
   correctAnswer Int
-  quiz          Quiz     @relation(fields: [quizId], references: [id])
+  quiz          Quiz     @relation(fields: [quizId], references: [id], onDelete: Cascade)
 }
 
 model Media {
@@ -243,7 +243,7 @@ model Media {
   type     String
   url      String
   caption  String?
-  lesson   Lesson  @relation(fields: [lessonId], references: [id])
+  lesson   Lesson  @relation(fields: [lessonId], references: [id], onDelete: Cascade)
 }
 
 model Subscription {

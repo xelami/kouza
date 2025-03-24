@@ -6,6 +6,7 @@ import { CheckCircle } from "lucide-react"
 import Link from "next/link"
 import { redirect } from "next/navigation"
 import React from "react"
+import LessonStatus from "@/components/module/lesson-status"
 
 export const runtime = "edge"
 
@@ -32,12 +33,18 @@ export default async function ModulePage({
     redirect(`/`)
   }
 
+  // Check if the module has any lessons
+  const hasLessons = module.lessons?.length > 0
+
   return (
     <div className="flex flex-col font-[family-name:var(--font-geist-sans)] h-full overflow-y-auto">
       <div className="flex flex-col p-4 md:p-6">
         <h3 className="max-w-5xl text-base md:text-lg font-light tracking-tight leading-snug">
           {module.description}
         </h3>
+
+        {/* Show the lesson status component when there are no lessons */}
+        {!hasLessons && <LessonStatus moduleId={module.id} />}
 
         <div className="flex flex-row items-center justify-between md:justify-start gap-4 py-8 md:gap-24 md:py-12">
           <div className="flex flex-col items-center gap-2">
@@ -57,9 +64,9 @@ export default async function ModulePage({
           </div>
         </div>
 
-        <div className="flex flex-col divide-y">
-          {module.lessons &&
-            module.lessons
+        {hasLessons ? (
+          <div className="flex flex-col divide-y">
+            {module.lessons
               .sort((a: Lesson, b: Lesson) => a.order - b.order)
               .map((lesson: Lesson) => (
                 <Link
@@ -90,7 +97,12 @@ export default async function ModulePage({
                   </div>
                 </Link>
               ))}
-        </div>
+          </div>
+        ) : (
+          <div className="flex flex-col items-center justify-center py-8 text-muted-foreground">
+            <p>Lessons are being generated in the background.</p>
+          </div>
+        )}
       </div>
     </div>
   )

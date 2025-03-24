@@ -17,6 +17,7 @@ import { z } from "zod"
 import { newCourse } from "@/app/api/courses/new-course"
 import { toast } from "sonner"
 import { newLessons } from "@/app/api/courses/new-lessons"
+import { useSession } from "next-auth/react"
 // import { isUserSubscribed } from "@/hooks/use-subscription"
 // import { db } from "@kouza/db"
 // import { auth } from "@/auth"
@@ -38,6 +39,8 @@ export default function NewCourseForm({
   pregeneratedPrompt?: string
   setIsSubmitted: (isSubmitted: boolean) => void
 }) {
+  const { data: session } = useSession()
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -48,24 +51,25 @@ export default function NewCourseForm({
   })
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
+    if (!session?.user?.id) {
+      toast.error("You must be logged in to create a course")
+      return
+    }
+
     setIsSubmitted(true)
     toast.success("Course creation started", {
       description:
-        "Modules and lessons will be populated over the next few minutes. You can continue browsing while this happens.",
+        "The course structure is being created. Lessons will be generated in the background and may take several minutes to complete.",
     })
 
     try {
-      const response = await fetch("/api/queue-course", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prompt: values.prompt }),
+      const userId = session.user.id
+      const response = await newCourse(values.prompt, userId)
+
+      toast.success("Course structure created", {
+        description:
+          "You can now view your course. Lessons are being generated in the background and will appear gradually.",
       })
-
-      if (!response.ok) {
-        throw new Error("Failed to start course creation")
-      }
-
-      // await newCourse(values.prompt)
     } catch (error: any) {
       toast.error(error.message)
       setIsSubmitted(false)
