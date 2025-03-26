@@ -27,11 +27,18 @@ export function FlashcardsProvider({ children }: FlashcardsProviderProps) {
   const [shouldRefreshStats, setShouldRefreshStats] = useState(false)
 
   const triggerStatsRefresh = () => {
-    setShouldRefreshStats(true)
-    // Reset after a short delay to allow components to react
-    setTimeout(() => {
-      setShouldRefreshStats(false)
-    }, 500)
+    // First set to false to ensure the change is detected even if already true
+    setShouldRefreshStats(false)
+
+    // Use requestAnimationFrame for better timing with browser rendering cycle
+    requestAnimationFrame(() => {
+      setShouldRefreshStats(true)
+
+      // Reset after a longer delay to ensure components have time to react
+      setTimeout(() => {
+        setShouldRefreshStats(false)
+      }, 1000)
+    })
   }
 
   const value = {

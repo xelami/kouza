@@ -74,7 +74,7 @@ export default async function ModulePage({
                   href={`/course/${courseSlug}/modules/${moduleSlug}/review/${lesson.slug}`}
                   className="flex flex-col sm:flex-row items-start sm:items-center gap-4 p-4 md:p-6 hover:bg-gray-100 dark:hover:bg-gray-800"
                 >
-                  <p className="text-lg font-light w-8">{lesson.order + 1}</p>
+                  <p className="text-lg font-light w-8">{lesson.order}</p>
 
                   <div className="flex-1 min-w-0 max-w-[300px] sm:max-w-full">
                     <h3 className="text-lg md:text-2xl font-semibold tracking-tight truncate">

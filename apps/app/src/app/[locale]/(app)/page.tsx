@@ -33,6 +33,8 @@ export default async function Home() {
     totalNotes,
   } = await getDashboardData(Number(session?.user.id))
 
+  console.log(reviseStats)
+
   return (
     <>
       <div className="flex flex-col md:grid grid-cols-12 grid-rows-4 gap-4 py-12 h-full">

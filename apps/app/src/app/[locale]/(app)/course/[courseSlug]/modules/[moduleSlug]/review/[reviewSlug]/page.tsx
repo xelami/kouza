@@ -131,7 +131,7 @@ export default function ReviewPage({
 
   return (
     <>
-      <div className="flex flex-col px-4 md:px-8">
+      <div className="flex flex-col px-4 md:px-8 pb-8 max-w-5xl mx-auto">
         <div className="flex flex-row items-center justify-between mt-4 gap-2">
           <Link
             className="flex flex-row items-center mt-4 gap-2"
@@ -211,7 +211,9 @@ export default function ReviewPage({
           </Link>
         </div>
       </div>
-      <div className="hidden xl:block h-screen sticky top-0 border-l border-gray-200">
+
+      {/* Sidebar content fixed to the right at full height on XL screens */}
+      <div className="hidden xl:block fixed top-0 right-0 w-80 2xl:w-96 3xl:w-[30rem] h-screen border-l border-gray-200 bg-background overflow-y-auto">
         <ASidebar
           lessonTitle={lesson?.title}
           context={assistantContext}

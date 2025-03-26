@@ -10,7 +10,9 @@
     "lint": "next lint",
     "pages:build": "pnpm @cloudflare/next-on-pages",
     "preview": "pnpm run pages:build && wrangler pages dev",
-    "deploy": "pnpm run pages:build && wrangler pages deploy"
+    "deploy": "pnpm run pages:build && wrangler pages deploy",
+    "trigger:dev": "cd ../../packages/db && pnpm prisma generate && cd ../../apps/app && trigger dev",
+    "trigger:deploy": "trigger deploy"
   },
   "dependencies": {
     "@ai-sdk/groq": "^1.1.11",

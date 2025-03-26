@@ -53,7 +53,7 @@ export default async function ReviewPage({ params }: { params: Params }) {
 
   return (
     <FlashcardsProvider>
-      <div className="max-w-4xl mx-auto p-6 flex flex-col items-center justify-center w-full">
+      <div className="max-w-4xl mx-auto h-full p-6 flex flex-col items-center justify-center w-full">
         <ReviewFlashcards
           // @ts-expect-error
           flashcards={module.flashcards}

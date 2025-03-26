@@ -163,7 +163,7 @@ export default function ReviewFlashcards({
           if (response.ok) {
             console.log("Session ended successfully")
             setSessionEnded(true)
-            // Trigger stats refresh when session ends
+            // Trigger stats refresh when session ends and ensure it has time to work
             triggerStatsRefresh()
           } else {
             console.error("Failed to end session:", response.status)
@@ -197,7 +197,10 @@ export default function ReviewFlashcards({
   const handleReturnToCourse = () => {
     // Trigger stats refresh before navigating back
     triggerStatsRefresh()
-    router.back()
+    // Add small delay to ensure the stats refresh is triggered before navigation
+    setTimeout(() => {
+      router.back()
+    }, 300)
   }
 
   if (!currentCard) {
@@ -487,7 +490,7 @@ export default function ReviewFlashcards({
           </Card>
         )}
 
-        <div className="flex justify-center sticky bottom-0 bg-white dark:bg-gray-950 py-4">
+        <div className="flex justify-center sticky bottom-0 py-4">
           <Button onClick={handleReturnToCourse}>Return to Course</Button>
         </div>
       </div>

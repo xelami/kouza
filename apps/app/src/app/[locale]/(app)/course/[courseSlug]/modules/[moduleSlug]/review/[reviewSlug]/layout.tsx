@@ -11,10 +11,10 @@ export default function ReviewLayout({
   const [mainContent, sidebarContent] = React.Children.toArray(children)
 
   return (
-    <div className="flex flex-col lg:flex-row min-h-screen mb-12 xl:mb-0">
-      <div className="grid grid-cols-1 xl:grid-cols-[3fr_1fr] w-full">
+    <div className="min-h-screen relative">
+      {/* Main container with space for the fixed sidebar on XL */}
+      <div className="w-full xl:pr-80 2xl:pr-96 3xl:pr-[30rem]">
         {mainContent}
-        <div className="hidden xl:block">{sidebarContent}</div>
       </div>
       <AssistantDrawer context={context} />
     </div>

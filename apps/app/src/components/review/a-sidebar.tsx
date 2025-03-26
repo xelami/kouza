@@ -37,7 +37,7 @@ export default function ASidebar({
   }, [])
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full w-full">
       <div className="flex-none p-4">
         <h3 className="text-3xl tracking-tighter font-medium text-center">
           Ask Professor
