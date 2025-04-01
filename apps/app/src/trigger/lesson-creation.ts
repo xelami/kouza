@@ -54,6 +54,57 @@ type CreateLessonsPayload = {
   userId: string
 }
 
+// Helper function to check if error is a rate limit error
+function isRateLimitError(error: any): boolean {
+  return (
+    error?.response?.status === 429 ||
+    error?.message?.includes("rate limit") ||
+    error?.message?.includes("Rate limit exceeded")
+  )
+}
+
+// Helper function for exponential backoff
+async function sleep(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms))
+}
+
+// Helper function to generate content with retries
+async function generateContentWithRetry(
+  model: any,
+  schema: any,
+  prompt: string,
+  maxRetries: number = 12,
+  baseDelay: number = 1000
+): Promise<any> {
+  let lastError: Error | null = null
+
+  for (let attempt = 0; attempt < maxRetries; attempt++) {
+    try {
+      return await generateObject({
+        model,
+        schema,
+        prompt,
+      })
+    } catch (error: any) {
+      lastError = error
+
+      if (isRateLimitError(error)) {
+        const delay = baseDelay * Math.pow(2, attempt)
+        logger.log(
+          `Rate limit hit, retrying in ${delay}ms (attempt ${attempt + 1}/${maxRetries})`
+        )
+        await sleep(delay)
+        continue
+      }
+
+      // If it's not a rate limit error, throw immediately
+      throw error
+    }
+  }
+
+  throw lastError || new Error("Max retries exceeded")
+}
+
 export const createLessonsTask = task({
   id: "create-lessons",
   // Set a longer max duration since this task is computationally intensive
@@ -66,14 +117,14 @@ export const createLessonsTask = task({
     })
 
     try {
-      // Generate lesson outlines based on subscription status
-      const lessonsResult = await generateObject({
-        model: openai("gpt-4o-mini", { structuredOutputs: true }),
-        schema: moduleLessonsSchema,
-        prompt: isSubscribed
+      // Generate lesson outlines with retry
+      const lessonsResult = await generateContentWithRetry(
+        openai("gpt-4o-mini", { structuredOutputs: true }),
+        moduleLessonsSchema,
+        isSubscribed
           ? subscribedModulePrompt(module.title)
-          : freeModulePrompt(module.title),
-      })
+          : freeModulePrompt(module.title)
+      )
 
       if (!lessonsResult?.object?.lessons) {
         throw new Error(`Failed to generate lessons for module ${module.title}`)
@@ -86,18 +137,18 @@ export const createLessonsTask = task({
 
       logger.log("Generated lesson outlines", { count: lessons.length })
 
-      // Generate content for each lesson in parallel
-      const contentPromises = lessons.map((lesson) =>
-        generateObject({
-          model: openai("gpt-4o-mini", { structuredOutputs: true }),
-          schema: lessonContentSchema,
-          prompt: `Create detailed educational content for lesson "${lesson?.title}".
+      // Generate content for each lesson in parallel with retries
+      const contentPromises = lessons.map((lesson: any) =>
+        generateContentWithRetry(
+          openai("gpt-4o-mini", { structuredOutputs: true }),
+          lessonContentSchema,
+          `Create detailed educational content for lesson "${lesson?.title}".
             The content should be at least 2000 words and focus purely on teaching the material.
             DO NOT include any quiz questions, exercises, or test material in the content section.
             The quiz section will be handled separately in the quiz object.
             After generating the main content, create a separate comprehensive quiz with multiple questions to test understanding.
-            Each quiz question must have exactly 4 options.`,
-        }).then((result) => ({
+            Each quiz question must have exactly 4 options.`
+        ).then((result) => ({
           moduleId: module.id,
           title: lesson.title,
           slug: `${lesson.slug}-${userId}-${Math.random().toString(36).slice(2, 5)}`,
